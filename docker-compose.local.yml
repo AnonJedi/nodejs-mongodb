@@ -1,0 +1,9 @@
+version: '2'
+services:
+  nodejs:
+    ports:
+      - "8080:8080"
+  mongodb:
+    ports:
+      - "27017:27017"
+      - "28017:28017"    

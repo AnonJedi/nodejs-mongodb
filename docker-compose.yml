@@ -1,0 +1,18 @@
+version: '2'
+services:
+  mongodb:
+    build:
+      context: .
+      dockerfile: docker/mongodb/Dockerfile
+    env_file: '.env.mongodb'
+  nodejs:
+    build:
+      context: .
+      dockerfile: docker/nodejs/Dockerfile
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/node_modules
+    depends_on:
+      - "mongodb"
+    env_file: '.env.mongodb'
+    command: /bin/bash -c "npm i && npm start"
