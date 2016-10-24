@@ -1,0 +1,28 @@
+{
+  "name": "bb-internship-api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Victor Pisarenko",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mongoose": "^4.6.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnonJedi/nodejs-mongodb.git"
+  },
+  "keywords": [
+    "Node.js",
+    "MongoDB",
+    "React.js"
+  ],
+  "bugs": {
+    "url": "https://github.com/AnonJedi/nodejs-mongodb/issues"
+  },
+  "homepage": "https://github.com/AnonJedi/nodejs-mongodb#readme",
+  "description": ""
+}

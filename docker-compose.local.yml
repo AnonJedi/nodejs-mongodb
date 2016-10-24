@@ -1,9 +1,12 @@
 version: '2'
 services:
-  nodejs:
+  api:
     ports:
-      - "8080:8080"
+      - "3001:3000"
   mongodb:
     ports:
       - "27017:27017"
-      - "28017:28017"    
+      - "28017:28017"
+  client:
+    ports:
+      - "3000:3000"    
