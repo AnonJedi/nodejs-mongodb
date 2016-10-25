@@ -19,6 +19,10 @@ function tryToConnectDB(error) {
 
 var intervalId = setInterval(tryToConnectDB, 1000);
 
+mongoose.Promise = global.Promise;
+
+app.use(require('body-parser')());
+
 var userRouter = require('./routes/user');
 app.use('/users', userRouter);
 

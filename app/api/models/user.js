@@ -1,13 +1,17 @@
+'use strict';
+
+
 var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-	_id: {
-		type: Schema.ObjectId,
-		required: true,
-		unique: true 
-	}
+	// _id: {
+	// 	type: Schema.Types.ObjectId,
+	// 	required: true,
+	// 	unique: true,
+	// 	index: true 
+	// },
 	firstname: {
 		type: String,
 		required: true
@@ -19,15 +23,22 @@ var userSchema = new Schema({
 	login: {
 		type: String,
 		required: true,
-		unique: true
+		unique: true,
+		index: true
 	},
 	password: {
 		type: String,
 		required: true
 	},
-	follow: [{ user_id: Schema.ObjectId }]
-}, { autoIndex: false });
+	stream_id: {
+		type: Schema.Types.ObjectId,
+		required: true,
+		unique: true
+	}
+}
+// , { autoIndex: false }
+);
 
 
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = mongoose.model('users', userSchema);

@@ -18,5 +18,5 @@ $ docker-compose up
 ```
 For stop the application use command:
 ```
-$docker-compose down
+$ docker-compose down
 ```

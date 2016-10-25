@@ -1,26 +1,11 @@
 'use strict';
 
-var express        = require('express'),
-	userService    = require('../services/user');
+var express           = require('express'),
+	userController    = require('../controllers/user');
 
 var router = express.Router();
 
-
-router.get('/', function(req, res) {
-	var users = userService.getAllUsers();
-	if (users) {
-		res.json({
-			success: true,
-			error: null,
-			data: users
-		});
-	} else {
-		res.json({
-			success: false,
-			error: 'Error occurred while fetching users',
-			data: null
-		});
-	}
-});
+router.get('/', userController.getAllUsers);
+router.post('/new', userController.createUser);
 
 module.exports = router;
