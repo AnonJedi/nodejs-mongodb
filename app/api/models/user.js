@@ -6,12 +6,6 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-	// _id: {
-	// 	type: Schema.Types.ObjectId,
-	// 	required: true,
-	// 	unique: true,
-	// 	index: true 
-	// },
 	firstname: {
 		type: String,
 		required: true
@@ -35,9 +29,7 @@ var userSchema = new Schema({
 		required: true,
 		unique: true
 	}
-}
-// , { autoIndex: false }
-);
+}, { autoIndex: false });
 
 
 

@@ -7,5 +7,6 @@ var router = express.Router();
 
 router.get('/', userController.getAllUsers);
 router.post('/new', userController.createUser);
+router.post('/:userId/follow/:followingUserId', userController.createFollower);
 
 module.exports = router;

@@ -2,6 +2,6 @@
 
 
 module.exports = function(msg, stack) {
-	this.stackTrace = stack;
+	this.stackTrace = `${stack}.     ${msg}`;
 	this.message = msg;
 }

@@ -11,6 +11,7 @@ module.exports.getAllUsers = function() {
 	return UserModel.find().exec();
 }
 
+
 module.exports.createUser = function(userData) {
 	var getHashPromise = new Promise(function(resolve, reject) {
 		bcrypt.hash(userData.password, 10, function(err, hash) {
@@ -51,5 +52,34 @@ module.exports.createUser = function(userData) {
 				throw err;
 			}
 			throw new ServiceException('Error occurred while creating user', err);
+		});
+}
+
+
+module.exports.createFollower = function(userId, followingUserId) {
+	var followingUser;
+	return UserModel.findById(followingUserId).exec()
+		.then(function(user) {
+			if(!user) {
+				throw new ServiceException(`Followed user with id - "${followingUserId}" is not found`);
+			}
+			followingUser = user;
+			return UserModel.findById(userId).exec();
+		})
+		.then(function(user) {
+			return StreamModel.findByIdAndUpdate(user.stream_id, {
+				$push: {
+					followers: {
+						stream_id: followingUser.stream_id
+					}
+				}
+			});
+		})
+		.catch(function(err) {
+			console.log(err);
+			if (err instanceof ServiceException) {
+				throw err;
+			}
+			throw new ServiceException('Error occurred while creating follower', err);
 		});
 }
