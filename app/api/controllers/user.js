@@ -75,3 +75,29 @@ module.exports.createFollower = function(req, res) {
 			})
 		});
 }
+
+
+module.exports.removeFollower = function(req, res) {
+	userService.removeFollower(req.params.userId, req.params.followingUserId)
+		.then(function() {
+			res.json({
+				success: true,
+				error: null,
+				data: null
+			})
+		})
+		.catch(function(err) {
+			console.log(err);
+			var error;
+			if (err instanceof ServiceException) {
+				error = err.message;
+			} else {
+				error = 'Error occurred while creating follower';
+			}
+			res.json({
+				success: false,
+				error: error,
+				data: null
+			})
+		});
+}

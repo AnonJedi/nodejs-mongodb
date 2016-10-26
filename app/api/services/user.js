@@ -17,7 +17,7 @@ module.exports.createUser = function(userData) {
 		bcrypt.hash(userData.password, 10, function(err, hash) {
 			if (err) {
 				console.log(err, `\nPassword is - ${password}`);
-				throw 'Something wrong with password';
+				reject(new ServiceException('Something wrong with password', err));
 			}
 			resolve(hash);
 		})
@@ -46,19 +46,15 @@ module.exports.createUser = function(userData) {
 			newUser.password = hash;
 			return newUser.save();
 		})
-		.catch(function(err) {
-			console.log(err);
-			if (err instanceof ServiceException) {
-				throw err;
-			}
-			throw new ServiceException('Error occurred while creating user', err);
-		});
 }
 
 
-module.exports.createFollower = function(userId, followingUserId) {
+module.exports.createFollower = function(userId, followingUserId) {	
 	var followingUser;
-	return UserModel.findById(followingUserId).exec()
+	return _checkEqualsIdsPromise(userId, followingUserId, 'User cannot follow to himself')
+		.then(function() {
+			return UserModel.findById(followingUserId).exec();
+		})
 		.then(function(user) {
 			if(!user) {
 				throw new ServiceException(`Followed user with id - "${followingUserId}" is not found`);
@@ -67,19 +63,47 @@ module.exports.createFollower = function(userId, followingUserId) {
 			return UserModel.findById(userId).exec();
 		})
 		.then(function(user) {
-			return StreamModel.findByIdAndUpdate(user.stream_id, {
+			return StreamModel.findByIdAndUpdate(followingUser.stream_id, {
 				$push: {
 					followers: {
-						stream_id: followingUser.stream_id
+						stream_id: user.stream_id
 					}
 				}
 			});
 		})
-		.catch(function(err) {
-			console.log(err);
-			if (err instanceof ServiceException) {
-				throw err;
+}
+
+
+module.exports.removeFollower = function(userId, followedUserId) {
+	var followingUser;
+	return _checkEqualsIdsPromise(userId, followedUserId, 'User cannot unfollow to himself')
+		.then(function() {
+			return UserModel.findById(followedUserId).exec();
+		})
+		.then(function(user) {
+			if(!user) {
+				throw new ServiceException(`Followed user with id - "${followedUserId}" is not found`);
 			}
-			throw new ServiceException('Error occurred while creating follower', err);
-		});
+			followingUser = user;
+			return UserModel.findById(userId).exec();
+		})
+		.then(function(user) {
+			return StreamModel.findByIdAndUpdate(followingUser.stream_id, {
+				$pull: {
+					followers: {
+						stream_id: user.stream_id
+					}
+				}
+			});
+		})
+}
+
+
+function _checkEqualsIdsPromise(firstId, secondId, rejectMessage) {
+	return new Promise(function(resolve, reject) {
+		if (firstId === secondId) {
+			reject(new ServiceException(rejectMessage));
+		}
+		resolve();
+	});
 }

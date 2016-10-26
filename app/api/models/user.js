@@ -1,7 +1,8 @@
 'use strict';
 
 
-var mongoose = require('mongoose');
+var mongoose    = require('mongoose'),
+    bcrypt      = require('bcrypt');
 
 var Schema = mongoose.Schema;
 
@@ -31,6 +32,14 @@ var userSchema = new Schema({
 	}
 }, { autoIndex: false });
 
+userSchema.methods.verifyPassword = function(password, callback) {
+	bcrypt.compare(password, this.password, function(err, isMatch) {
+		if (err) {
+			return callback(err);
+		}
+		callback(null, isMatch);
+	});
+};
 
 
 module.exports = mongoose.model('users', userSchema);

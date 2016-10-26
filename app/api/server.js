@@ -1,9 +1,13 @@
 'use strict';
 
-var express = require('express');
+var express          = require('express'),
+    mongoose         = require('mongoose'),
+    passport         = require('./controllers/auth').passport,
+    userRouter       = require('./routes/user'),
+    authRouter       = require('./routes/auth');
+
 var app = express();
 
-var mongoose = require('mongoose');
 var dbUrl = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.MONGODB_DATABASE}`
 
 function tryToConnectDB(error) {
@@ -21,10 +25,16 @@ var intervalId = setInterval(tryToConnectDB, 1000);
 
 mongoose.Promise = global.Promise;
 
-app.use(require('body-parser')());
+app.use(require('body-parser').urlencoded({
+  	extended: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
-var userRouter = require('./routes/user');
-app.use('/users', userRouter);
+app.use('/', authRouter);
+app.use('/api/v1/users', userRouter);
 
 
 app.listen(3000);
+
+console.log('Application is run');
