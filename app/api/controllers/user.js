@@ -2,25 +2,17 @@
 
 
 var userService        = require('../services/user'),
-    ServiceException   = require('../exceptions/service-exception');
+	presenter          = require('../presenters/presenter');
 
 
 module.exports.getAllUsers = function(req, res) {
 	userService.getAllUsers()
 		.then(function(users) {
-			res.json({
-				success: true,
-				error: null,
-				data: users
-			});
+			res.json(presenter.success(users));
 		})
 		.catch(function(err) {
 			console.log(err);
-			res.json({
-				success: false,
-				error: 'Error occurred while fetching user list',
-				data: null
-			});
+			res.json(presenter.fail(err, 'Error occurred while fetching user list'));
 		});
 };
 
@@ -28,19 +20,11 @@ module.exports.getAllUsers = function(req, res) {
 module.exports.getUser = function(req, res) {
 	userService.getUser(req.params.userId)
 		.then(function(user) {
-			res.json({
-				success: true,
-				error: null,
-				data: user
-			});
+			res.json(presenter.success(user));
 		})
 		.catch(function(err) {
 			console.log(err);
-			res.json({
-				success: false,
-				error: 'Error occurred while fetching user',
-				data: null
-			});
+			res.json(presenter.fail(err, 'Error occurred while fetching user'));
 		});
 };
 
@@ -48,25 +32,11 @@ module.exports.getUser = function(req, res) {
 module.exports.createUser = function(req, res) {
 	userService.createUser(req.body)
 		.then(function(user) {
-			res.json({
-				success: true,
-				error: null,
-				data: user
-			});
+			res.json(presenter.success(user));
 		})
 		.catch(function(err) {
 			console.log(err);
-			var error;
-			if (err instanceof ServiceException) {
-				error = err.message;
-			} else {
-				error = 'Error occurred while creating user';
-			}
-			res.json({
-				success: false,
-				error: error,
-				data: null
-			})
+			res.json(presenter.fail(err, 'Error occurred while creating user'));
 		});
 };
 
@@ -74,25 +44,11 @@ module.exports.createUser = function(req, res) {
 module.exports.createFollower = function(req, res) {
 	userService.createFollower(req.params.userId, req.params.followingUserId)
 		.then(function() {
-			res.json({
-				success: true,
-				error: null,
-				data: null
-			})
+			res.json(presenter.success(null));
 		})
 		.catch(function(err) {
 			console.log(err);
-			var error;
-			if (err instanceof ServiceException) {
-				error = err.message;
-			} else {
-				error = 'Error occurred while creating follower';
-			}
-			res.json({
-				success: false,
-				error: error,
-				data: null
-			})
+			res.json(presenter.fail(err, 'Error occurred while creating follower'));
 		});
 };
 
@@ -100,24 +56,22 @@ module.exports.createFollower = function(req, res) {
 module.exports.removeFollower = function(req, res) {
 	userService.removeFollower(req.params.userId, req.params.followingUserId)
 		.then(function() {
-			res.json({
-				success: true,
-				error: null,
-				data: null
-			})
+			res.json(presenter.success(null));
 		})
 		.catch(function(err) {
 			console.log(err);
-			var error;
-			if (err instanceof ServiceException) {
-				error = err.message;
-			} else {
-				error = 'Error occurred while creating follower';
-			}
-			res.json({
-				success: false,
-				error: error,
-				data: null
-			})
+			res.json(presenter.fail(err, 'Error occurred while deleting follower'));
 		});
+};
+
+
+module.exports.deleteUser = function(req, res) {
+	userService.removeUser(req.user.id, req.params.userId)
+		.then(function() {
+			res.json(presenter.success(null));
+		})
+		.catch(function(err) {
+			console.log(err);
+			presenter.fail(err, 'Error occurred while deleting user');
+		})
 };

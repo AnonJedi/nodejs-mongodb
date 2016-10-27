@@ -54,21 +54,21 @@ module.exports.createUser = function(userData) {
 };
 
 
-module.exports.createFollower = function(userId, followingUserId) {	
-	var followingUser;
-	return _checkEqualsIdsPromise(userId, followingUserId, 'User cannot follow to himself')
+module.exports.createFollower = function(userId, trackedUserId) {
+	var trackedUser;
+	return _isDiffIds(userId, trackedUserId, 'User cannot follow to himself')
 		.then(function() {
-			return UserModel.findById(followingUserId).exec();
+			return UserModel.findById(trackedUserId).exec();
 		})
 		.then(function(user) {
 			if(!user) {
-				throw new ServiceException(`Followed user with id - "${followingUserId}" is not found`);
+				throw new ServiceException(`User with id - "${trackedUserId}" is not found`);
 			}
-			followingUser = user;
+			trackedUser = user;
 			return UserModel.findById(userId).exec();
 		})
 		.then(function(user) {
-			return StreamModel.findByIdAndUpdate(followingUser.stream_id, {
+			return StreamModel.findByIdAndUpdate(trackedUser.stream_id, {
 				$push: {
 					followers: {
 						stream_id: user.stream_id
@@ -79,21 +79,21 @@ module.exports.createFollower = function(userId, followingUserId) {
 };
 
 
-module.exports.removeFollower = function(userId, followedUserId) {
-	var followingUser;
-	return _checkEqualsIdsPromise(userId, followedUserId, 'User cannot unfollow to himself')
+module.exports.removeFollower = function(userId, trackedUserId) {
+	var trackedUser;
+	return _isDiffIds(userId, trackedUserId, 'User cannot subscribe to himself')
 		.then(function() {
-			return UserModel.findById(followedUserId).exec();
+			return UserModel.findById(trackedUserId).exec();
 		})
 		.then(function(user) {
 			if(!user) {
-				throw new ServiceException(`Followed user with id - "${followedUserId}" is not found`);
+				throw new ServiceException(`User with id - "${trackedUserId}" is not found`);
 			}
-			followingUser = user;
+			trackedUser = user;
 			return UserModel.findById(userId).exec();
 		})
 		.then(function(user) {
-			return StreamModel.findByIdAndUpdate(followingUser.stream_id, {
+			return StreamModel.findByIdAndUpdate(trackedUser.stream_id, {
 				$pull: {
 					followers: {
 						stream_id: user.stream_id
@@ -104,7 +104,7 @@ module.exports.removeFollower = function(userId, followedUserId) {
 };
 
 
-function _checkEqualsIdsPromise(firstId, secondId, rejectMessage) {
+function _isDiffIds(firstId, secondId, rejectMessage) {
 	return new Promise(function(resolve, reject) {
 		if (firstId === secondId) {
 			reject(new ServiceException(rejectMessage));
@@ -112,3 +112,16 @@ function _checkEqualsIdsPromise(firstId, secondId, rejectMessage) {
 		resolve();
 	});
 }
+
+
+module.exports.removeUser = function(authUserId, removedUserId) {
+	return new Promise(function(resolve, reject) {
+		if (authUserId != removedUserId) {
+			reject(new ServiceException('Authorized user cannot remove another user'));
+		}
+		resolve();
+	})
+		.then(function() {
+			UserModel.findById(removedUserId).remove();
+		});
+};
