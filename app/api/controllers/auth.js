@@ -48,14 +48,14 @@ passport.deserializeUser(function(id, cb) {
 
 module.exports.passport = passport;
 module.exports.loginUser = passport.authenticate('local', { session : false });
-module.exports.isAuth = expressJwt({ secret: 'bbuttins with nodejs' });
+module.exports.isAuth = expressJwt({ secret: 'bbuttons with nodejs' });
 
 module.exports.generateToken = function(req, res, next) {
-	req.token = jwt.sign({ id: req.user.id }, 'bbuttins with nodejs', {
+	req.token = jwt.sign({ id: req.user.id }, 'bbuttons with nodejs', {
 		expiresIn: '7d'
 	});
 	next();
-}
+};
 
 
 module.exports.respond = function(req, res) {
@@ -67,4 +67,25 @@ module.exports.respond = function(req, res) {
 			token: req.token
 		}
 	});
-}
+};
+
+
+module.exports.logout = function(req, res) {
+	delete req.user;
+	res.json({
+		success: true,
+		error: null,
+		data: null
+	})
+};
+
+
+module.exports.unauthHandler = function (err, req, res, next) {
+	if (err.name === 'UnauthorizedError') {
+		res.json({
+			success: false,
+			error: `${err.name}: ${err.message}`,
+			data: null
+		})
+	}
+};

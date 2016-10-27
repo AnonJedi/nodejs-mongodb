@@ -3,6 +3,7 @@
 var express          = require('express'),
     mongoose         = require('mongoose'),
     passport         = require('./controllers/auth').passport,
+	unauthHandler    = require('./controllers/auth').unauthHandler,
     userRouter       = require('./routes/user'),
     authRouter       = require('./routes/auth');
 
@@ -34,7 +35,6 @@ app.use(passport.session());
 app.use('/', authRouter);
 app.use('/api/v1/users', userRouter);
 
+app.use(unauthHandler);
 
 app.listen(3000);
-
-console.log('Application is run');

@@ -7,6 +7,6 @@ var express           = require('express'),
 var router = express.Router();
 
 router.post('/login', auth.loginUser, auth.generateToken, auth.respond);
-
+router.get('/logout', auth.isAuth, auth.logout);
 
 module.exports = router;
