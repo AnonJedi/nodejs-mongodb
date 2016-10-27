@@ -62,7 +62,13 @@ module.exports.getPostList = function(userId, queryData) {
         })
         .then(function(dbUser) {
             user = dbUser;
-            return PostModel.find({$or: [{stream_id: dbUser.stream_id}, {followers: dbUser.stream_id}]})
+            return PostModel.find({
+                $or: [{
+                    stream_id: dbUser.stream_id
+                }, {
+                    'followers.stream_id': dbUser.stream_id
+                }]
+            })
                 .sort(sorting)
                 .skip(queryData.size * queryData.offset)
                 .limit(queryData.size)
