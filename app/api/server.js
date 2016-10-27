@@ -2,6 +2,7 @@
 
 var express          = require('express'),
     mongoose         = require('mongoose'),
+	bodyParser       = require('body-parser'),
     passport         = require('./controllers/auth').passport,
 	unauthHandler    = require('./controllers/auth').unauthHandler,
     userRouter       = require('./routes/user'),
@@ -27,7 +28,10 @@ var intervalId = setInterval(tryToConnectDB, 1000);
 
 mongoose.Promise = global.Promise;
 
-app.use(require('body-parser').json());
+app.use(bodyParser.urlencoded({
+  	extended: true
+}));
+app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 

@@ -7,6 +7,7 @@ var express           = require('express'),
 
 var router = express.Router({ mergeParams: true });
 
+router.get('/', isAuth, post.getPosts);
 router.post('/new', isAuth, post.createPost);
 
 

@@ -24,5 +24,16 @@ module.exports.createPost = function(req, res) {
                 res.json(presenter.fail(err, 'Error occurred while creating new post'));
             })
     }
+};
 
+
+module.exports.getPosts = function(req, res) {
+    postService.getPostList(req.params.userId, req.query)
+        .then(function(data) {
+            res.json(presenter.success(data));
+        })
+        .catch(function(err) {
+            console.log(err);
+            res.json(presenter.fail(err, 'Error occurred while fetching post list. Check the params'));
+        })
 };

@@ -22,7 +22,11 @@ var postSchema = new Schema({
 	likes: [{ user_id: {
 		type: Schema.Types.ObjectId,
 		index: true
-	}}]
+	}}],
+	created_at: {
+		type : Date,
+		default: Date.now
+	}
 }, { autoIndex: false });
 
 

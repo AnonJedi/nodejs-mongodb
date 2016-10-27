@@ -5,7 +5,9 @@ var passport        = require('passport'),
     LocalStrategy   = require('passport-local').Strategy,
     jwt             = require('jsonwebtoken'),
     expressJwt      = require('express-jwt'),
-    UserModel       = require('../models/user');
+	blacklist       = require('express-jwt-blacklist'),
+    UserModel       = require('../models/user'),
+	presenter       = require('../presenters/presenter');
 
 
 passport.use(new LocalStrategy(
@@ -52,40 +54,39 @@ module.exports.isAuth = expressJwt({ secret: 'bbuttons with nodejs' });
 
 module.exports.generateToken = function(req, res, next) {
 	req.token = jwt.sign({ id: req.user.id }, 'bbuttons with nodejs', {
-		expiresIn: '7d'
+		expiresIn: '1d'
 	});
 	next();
 };
 
 
 module.exports.respond = function(req, res) {
-	res.json({
-		success: true,
-		error: null,
-		data: {
-			user: req.user,
-			token: req.token
-		}
+	res.json(presenter.success({
+		user: req.user,
+		token: req.token
+	}));
+};
+
+
+module.exports.isRevokedCallback = function(req, payload, done){
+	var issuer = payload.iss;
+	var tokenId = payload.jti;
+
+	data.getRevokedToken(issuer, tokenId, function(err, token){
+		if (err) { return done(err); }
+		return done(null, !!token);
 	});
 };
 
 
 module.exports.logout = function(req, res) {
-	delete req.user;
-	res.json({
-		success: true,
-		error: null,
-		data: null
-	})
+	blacklist.revoke(req.user);
+	res.json(presenter.success(null));
 };
 
 
 module.exports.unauthHandler = function (err, req, res, next) {
 	if (err.name === 'UnauthorizedError') {
-		res.json({
-			success: false,
-			error: `${err.name}: ${err.message}`,
-			data: null
-		})
+		res.json(presenter.fail(null, `${err.name}: ${err.message}`));
 	}
 };
