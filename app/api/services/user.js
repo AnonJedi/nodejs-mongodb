@@ -9,7 +9,12 @@ var UserModel          = require('../models/user'),
 
 module.exports.getAllUsers = function() {
 	return UserModel.find().exec();
-}
+};
+
+
+module.exports.getUser = function (userId) {
+	return UserModel.findById(userId).exec();
+};
 
 
 module.exports.createUser = function(userData) {
@@ -21,7 +26,7 @@ module.exports.createUser = function(userData) {
 			}
 			resolve(hash);
 		})
-	})
+	});
 
 	var newUser = new UserModel({
 		login: userData.login,
@@ -46,7 +51,7 @@ module.exports.createUser = function(userData) {
 			newUser.password = hash;
 			return newUser.save();
 		})
-}
+};
 
 
 module.exports.createFollower = function(userId, followingUserId) {	
@@ -71,7 +76,7 @@ module.exports.createFollower = function(userId, followingUserId) {
 				}
 			});
 		})
-}
+};
 
 
 module.exports.removeFollower = function(userId, followedUserId) {
@@ -96,7 +101,7 @@ module.exports.removeFollower = function(userId, followedUserId) {
 				}
 			});
 		})
-}
+};
 
 
 function _checkEqualsIdsPromise(firstId, secondId, rejectMessage) {

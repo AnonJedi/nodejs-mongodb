@@ -5,7 +5,8 @@ var express          = require('express'),
     passport         = require('./controllers/auth').passport,
 	unauthHandler    = require('./controllers/auth').unauthHandler,
     userRouter       = require('./routes/user'),
-    authRouter       = require('./routes/auth');
+    authRouter       = require('./routes/auth'),
+	postRouter       = require('./routes/post');
 
 var app = express();
 
@@ -26,14 +27,13 @@ var intervalId = setInterval(tryToConnectDB, 1000);
 
 mongoose.Promise = global.Promise;
 
-app.use(require('body-parser').urlencoded({
-  	extended: true
-}));
+app.use(require('body-parser').json());
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', authRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/users/:userId/posts', postRouter);
 
 app.use(unauthHandler);
 

@@ -22,7 +22,27 @@ module.exports.getAllUsers = function(req, res) {
 				data: null
 			});
 		});
-}
+};
+
+
+module.exports.getUser = function(req, res) {
+	userService.getUser(req.params.userId)
+		.then(function(user) {
+			res.json({
+				success: true,
+				error: null,
+				data: user
+			});
+		})
+		.catch(function(err) {
+			console.log(err);
+			res.json({
+				success: false,
+				error: 'Error occurred while fetching user',
+				data: null
+			});
+		});
+};
 
 
 module.exports.createUser = function(req, res) {
@@ -48,7 +68,7 @@ module.exports.createUser = function(req, res) {
 				data: null
 			})
 		});
-}
+};
 
 
 module.exports.createFollower = function(req, res) {
@@ -74,7 +94,7 @@ module.exports.createFollower = function(req, res) {
 				data: null
 			})
 		});
-}
+};
 
 
 module.exports.removeFollower = function(req, res) {
@@ -100,4 +120,4 @@ module.exports.removeFollower = function(req, res) {
 				data: null
 			})
 		});
-}
+};

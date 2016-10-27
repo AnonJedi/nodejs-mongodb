@@ -8,6 +8,7 @@ var router = express.Router();
 
 router.get('/', isAuth, userController.getAllUsers);
 router.post('/new', isAuth, userController.createUser);
+router.get('/:userId', isAuth, userController.getUser);
 router.post('/:userId/follow/:followingUserId', isAuth, userController.createFollower);
 router.post('/:userId/unfollow/:followingUserId', isAuth, userController.removeFollower);
 

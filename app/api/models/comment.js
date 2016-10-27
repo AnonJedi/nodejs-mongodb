@@ -6,12 +6,6 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var commentSchema = new Schema({
-	_id: {
-		type: Schema.Types.ObjectId,
-		required: true,
-		unique: true,
-		index: true 
-	},
 	author: Schema.Types.Mixed,
 	post_id: {
 		type: Schema.Types.ObjectId,
@@ -26,4 +20,4 @@ var commentSchema = new Schema({
 
 
 
-module.exports = mongoose.model('comment', commentSchema);
+module.exports = mongoose.model('comments', commentSchema);

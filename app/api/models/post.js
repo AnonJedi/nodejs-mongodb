@@ -6,11 +6,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var postSchema = new Schema({
-	_id: {
-		type: Schema.Types.ObjectId,
-		required: true,
-		unique: true,
-		index: true 
+	text: {
+		type: String,
+		required: true
 	},
 	stream_id: {
 		type: Schema.Types.ObjectId,
@@ -29,4 +27,4 @@ var postSchema = new Schema({
 
 
 
-module.exports = mongoose.model('post', postSchema);
+module.exports = mongoose.model('posts', postSchema);
