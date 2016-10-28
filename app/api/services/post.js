@@ -101,13 +101,13 @@ module.exports.getPostList = function (userId, queryData) {
 };
 
 
-module.exports.editPost = function (authUserId, userId, postId, text) {
+module.exports.editPost = function (authorizedUserId, userId, postId, text) {
     var user;
     return new Promise(function (resolve, reject) {
         if (!text || !text.trim()) {
             reject(new ServiceException('New text cannot be empty'));
         }
-        if (authUserId != userId) {
+        if (authorizedUserId != userId) {
             reject(new ServiceException('User cannot edit posts of another users'));
         }
         resolve();
@@ -133,5 +133,32 @@ module.exports.editPost = function (authUserId, userId, postId, text) {
                     post: updatedPost
                 });
             })
+        });
+};
+
+
+module.exports.deletePost = function (authorizedUserId, userId, postId) {
+    var user;
+    return new Promise(function (resolve, reject) {
+        if (authorizedUserId != userId) {
+            reject(new ServiceException('User cannot remove posts of another users'));
+        }
+        resolve();
+    })
+        .then(function () {
+            return UserModel.findById(userId).exec();
+        })
+        .then(function (dbUser) {
+            user = dbUser;
+            return PostModel.findById(postId).exec();
+        })
+        .then(function (post) {
+            if (!post) {
+                throw new ServiceException(`Post with id ${postId} is not found`);
+            }
+            if (!user.stream_id.equals(post.stream_id)) {
+                throw new ServiceException('User cannot edit posts of another users');
+            }
+            return PostModel.remove({ _id: postId });
         });
 };

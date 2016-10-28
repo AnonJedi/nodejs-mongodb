@@ -14,7 +14,7 @@ var app = express();
 
 var dbUrl = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.MONGODB_DATABASE}`
 
-function tryToConnectDB(error) {
+function tryToConnectDB() {
 	mongoose.connect(dbUrl, function(error) {
 		if (!error) {
 			console.log('DB connection complete');
