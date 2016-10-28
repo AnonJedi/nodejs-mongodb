@@ -61,3 +61,15 @@ module.exports.deletePost = function (req, res) {
             res.json(presenter.fail(err, 'Error occurred while deleting post'));
         });
 };
+
+
+module.exports.togglePostLike = function (req, res) {
+    postService.togglePostLike(req.user.id, req.params.userId, req.params.postId)
+        .then(function () {
+            res.json(presenter.success(null));
+        })
+        .catch(function (err) {
+            console.log(err);
+            res.json(presenter.fail(err, 'Error occurred while toggling like to post'));
+        });
+};

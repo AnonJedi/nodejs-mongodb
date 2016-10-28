@@ -62,6 +62,9 @@ module.exports.getPostList = function (userId, queryData) {
         })
         .then(function (dbUser) {
             user = dbUser;
+            if (!user) {
+                throw new ServiceException(`User with id ${userId} is not found`);
+            }
             return PostModel.find({
                 $or: [{
                     stream_id: dbUser.stream_id
@@ -120,6 +123,9 @@ module.exports.editPost = function (authorizedUserId, userId, postId, text) {
             return PostModel.findById(postId).exec();
         })
         .then(function (post) {
+            if (!post) {
+                throw new ServiceException(`Post with id ${postId} is not found`);
+            }
             if (!user.stream_id.equals(post.stream_id)) {
                 throw new ServiceException('User cannot edit posts of another users');
             }
@@ -160,5 +166,48 @@ module.exports.deletePost = function (authorizedUserId, userId, postId) {
                 throw new ServiceException('User cannot edit posts of another users');
             }
             return PostModel.remove({ _id: postId });
+        });
+};
+
+
+module.exports.togglePostLike = function (authorizedUserId, userId, postId) {
+    var user;
+    return new Promise(function (resolve, reject) {
+        if (authorizedUserId != userId) {
+            reject(new ServiceException('User cannot set likes as another user'));
+        }
+        resolve();
+    })
+        .then(function () {
+            return UserModel.findById(userId).exec();
+        })
+        .then(function (dbUser) {
+            user = dbUser;
+            return PostModel.findById(postId).exec();
+        })
+        .then(function (post) {
+            if (!post) {
+                throw new ServiceException(`Post with id ${postId} is not found`);
+            }
+            var likeInPost = -1;
+            post.likes.forEach(function (item, i) {
+                if (item._id.equals(userId)) {
+                    likeInPost = i;
+                }
+            });
+            if (likeInPost === -1) {
+                post.likes.push(userId);
+            } else {
+                post.likes.splice(likeInPost, 1);
+            }
+            return post.save();
+        })
+        .then(function (updatedPost) {
+            return new Promise(function (resolve) {
+                resolve({
+                    user: user,
+                    post: updatedPost
+                })
+            })
         });
 };
