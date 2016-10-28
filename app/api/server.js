@@ -3,6 +3,7 @@
 var express          = require('express'),
     mongoose         = require('mongoose'),
 	bodyParser       = require('body-parser'),
+	morgan           = require('morgan'),
     passport         = require('./controllers/auth').passport,
 	unauthHandler    = require('./controllers/auth').unauthHandler,
     userRouter       = require('./routes/user'),
@@ -28,6 +29,7 @@ var intervalId = setInterval(tryToConnectDB, 1000);
 
 mongoose.Promise = global.Promise;
 
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
   	extended: true
 }));

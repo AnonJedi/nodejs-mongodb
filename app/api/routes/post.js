@@ -9,6 +9,7 @@ var router = express.Router({ mergeParams: true });
 
 router.get('/', isAuth, post.getPosts);
 router.post('/new', isAuth, post.createPost);
+router.put('/:postId', isAuth, post.editPost);
 
 
 module.exports = router;
