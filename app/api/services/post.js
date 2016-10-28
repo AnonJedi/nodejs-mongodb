@@ -1,11 +1,12 @@
 'use strict';
 
 
-var PostModel = require('../models/post'),
-    StreamModel = require('../models/stream'),
-    UserModel = require('../models/user'),
-    constants = require('../constants'),
-    ServiceException = require('../exceptions/service-exception');
+var PostModel           = require('../models/post'),
+    StreamModel         = require('../models/stream'),
+    UserModel           = require('../models/user'),
+    constants           = require('../constants'),
+    commentService      = require('../services/comment'),
+    ServiceException    = require('../exceptions/service-exception');
 
 module.exports.createPost = function (userId, postText) {
     var userData;
@@ -39,7 +40,7 @@ module.exports.getPostList = function (userId, queryData) {
 
     var sorting = constants.postSorting[queryData.sort] || constants.postSorting.date;
 
-    var posts, user;
+    var posts, user, count;
 
     return new Promise(function (resolve, reject) {
         var error;
@@ -89,7 +90,21 @@ module.exports.getPostList = function (userId, queryData) {
                 .count()
                 .exec()
         })
-        .then(function (count) {
+        .then(function (dbCount) {
+            count = dbCount;
+            return new Promise(function (resolve) {
+                posts.forEach(function (post, i) {
+                    commentService.getCommentsPreview(post._id)
+                        .then(function (comments) {
+                            post.comments = comments;
+                            if (posts.length == i) {
+                                resolve()
+                            }
+                        })
+                });
+            });
+        })
+        .then(function () {
             return new Promise(function (resolve) {
                 resolve({
                     posts: posts,
@@ -191,12 +206,12 @@ module.exports.togglePostLike = function (authorizedUserId, userId, postId) {
             }
             var likeInPost = -1;
             post.likes.forEach(function (item, i) {
-                if (item._id.equals(userId)) {
+                if (item.user_id.equals(userId)) {
                     likeInPost = i;
                 }
             });
             if (likeInPost === -1) {
-                post.likes.push(userId);
+                post.likes.push({user_id: userId});
             } else {
                 post.likes.splice(likeInPost, 1);
             }

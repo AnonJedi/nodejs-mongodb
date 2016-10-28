@@ -27,6 +27,11 @@ module.exports.createPost = function (req, res) {
 };
 
 
+module.exports.getPost = function (req, res) {
+
+};
+
+
 module.exports.getPosts = function (req, res) {
     postService.getPostList(req.params.userId, req.query)
         .then(function (data) {
