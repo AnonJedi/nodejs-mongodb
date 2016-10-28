@@ -65,8 +65,8 @@ module.exports.deletePost = function (req, res) {
 
 module.exports.togglePostLike = function (req, res) {
     postService.togglePostLike(req.user.id, req.params.userId, req.params.postId)
-        .then(function () {
-            res.json(presenter.success(null));
+        .then(function (data) {
+            res.json(presenter.success(data));
         })
         .catch(function (err) {
             console.log(err);
