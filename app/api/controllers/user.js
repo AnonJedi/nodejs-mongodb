@@ -2,7 +2,8 @@
 
 
 var userService        = require('../services/user'),
-	presenter          = require('../presenters/presenter');
+	presenter          = require('../presenters/presenter'),
+	validators         = require('../validators/user');
 
 
 module.exports.getAllUsers = function(req, res) {
@@ -30,14 +31,19 @@ module.exports.getUser = function(req, res) {
 
 
 module.exports.createUser = function(req, res) {
-	userService.createUser(req.body)
-		.then(function(user) {
-			res.json(presenter.success(user));
-		})
-		.catch(function(err) {
-			console.log(err);
-			res.json(presenter.fail(err, 'Error occurred while creating user'));
-		});
+	var errors = validators.createUser(req.body);
+	if (errors) {
+		res.json(presenter.fail(null, errors));
+	} else {
+		userService.createUser(req.body)
+			.then(function(user) {
+				res.json(presenter.success(user));
+			})
+			.catch(function(err) {
+				console.log(err);
+				res.json(presenter.fail(err, 'Error occurred while creating user'));
+			});
+	}
 };
 
 
