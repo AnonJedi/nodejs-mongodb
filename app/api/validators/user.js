@@ -1,6 +1,9 @@
 'use strict';
 
 
+var isValidObjectId = require('mongoose').Types.ObjectId.isValid;
+
+
 module.exports.createUser = function (data) {
     if (!data) {
         return 'User data is required';
@@ -16,4 +19,9 @@ module.exports.createUser = function (data) {
         }
     });
     return errors;
+};
+
+
+module.exports.validateUserId = function (userId) {
+    return isValidObjectId(userId);
 };
