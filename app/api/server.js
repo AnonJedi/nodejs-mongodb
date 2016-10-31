@@ -12,7 +12,9 @@ var express          = require('express'),
 
 var app = express();
 
-var dbUrl = `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.MONGODB_DATABASE}`
+var dbUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.DATABASE_NAME}`;
+
+mongoose.Promise = global.Promise;
 
 function tryToConnectDB() {
 	mongoose.connect(dbUrl, function(error) {
@@ -26,8 +28,6 @@ function tryToConnectDB() {
 }
 
 var intervalId = setInterval(tryToConnectDB, 1000);
-
-mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({

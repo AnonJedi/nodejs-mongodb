@@ -1,1 +1,2 @@
 FROM tutum/mongodb
+#RUN /bin/bash -c "mongo admin -u admin -p $MONGODB_PASS --eval \"db.getSiblingDB($DATABASE_NAME).createUser({user: \"$DATABASE_USER\", pwd: \"$MONGODB_PASS\", roles: [{role: 'readWrite', db: \"$DATABASE_NAME\"}]})\""

@@ -3,21 +3,25 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "mocha --reporter spec"
   },
   "author": "Victor Pisarenko",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
     "express": "^4.14.0",
     "express-jwt": "^5.1.0",
     "express-jwt-blacklist": "^1.1.0",
     "jsonwebtoken": "^7.1.9",
+    "mocha": "^3.1.2",
     "mongoose": "^4.6.4",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "request": "^2.76.0"
   },
   "repository": {
     "type": "git",
