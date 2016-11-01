@@ -12,7 +12,9 @@ const postRouter       = require('./routes/post');
 
 const app = express();
 
-const dbUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.DATABASE_NAME}`;
+let dbUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.MONGODB_PASS}@mongodb:27017/`;
+
+dbUrl += process.env.NODE_ENV == 'test' ? 'test' : process.env.DATABASE_NAME;
 
 mongoose.Promise = global.Promise;
 
@@ -43,4 +45,6 @@ app.use('/api/v1/users/:userId/posts', postRouter);
 
 app.use(unauthHandler);
 
-app.listen(3000);
+const port = process.env.NODE_ENV == 'test' ? process.env.TEST_PORT : process.env.PORT;
+
+app.listen(port);

@@ -14,7 +14,9 @@ services:
       - /usr/src/node_modules
     links:
       - "mongodb"
-    env_file: '.env.mongodb'
+    env_file:
+      - ".env.mongodb"
+      - ".env.api"
     command: /bin/bash -c "npm i && npm start"
   client:
     build:

@@ -1,21 +1,49 @@
 'use strict';
 
 
-const utils               = require('./utils');
-const userService         = require('../services/user');
 const expect              = require('chai').expect;
-const streamModel         = require('../models/stream');
 const bcrypt              = require('bcrypt');
+const mongoose            = require('mongoose');
+const request             = require('request');
+const userService         = require('../services/user');
+const streamModel         = require('../models/stream');
 const ServiceException    = require('../exceptions/service-exception');
 
 
-describe('User: service', () => {
+describe('Integration user tests', () => {
     const userData = {
         login: 'test',
         password: 'test',
         firstname: 'test',
         lastname: 'test'
     };
+
+    beforeEach(done => {
+        const clearDB = () => {
+            for (let i in mongoose.connection.collections) {
+                mongoose.connection.collections[i].remove(() => {});
+            }
+        };
+
+        if (mongoose.connection.readyState === 0) {
+            mongoose.connect(dbUrl, err => {
+                if (err) {
+                    throw err;
+                }
+                clearDB();
+            });
+        } else {
+            clearDB();
+        }
+
+        return done();
+    });
+
+    afterEach(function (done) {
+        mongoose.disconnect();
+        return done();
+    });
+
 
     describe('#createUser()', () => {
         it('creation of user and his stream with valid data', done => {
