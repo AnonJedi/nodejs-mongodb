@@ -1,13 +1,13 @@
 'use strict';
 
 
-var passport        = require('passport'),
-    LocalStrategy   = require('passport-local').Strategy,
-    jwt             = require('jsonwebtoken'),
-    expressJwt      = require('express-jwt'),
-	blacklist       = require('express-jwt-blacklist'),
-    UserModel       = require('../models/user'),
-	presenter       = require('../presenters/presenter');
+const passport        = require('passport');
+const LocalStrategy   = require('passport-local').Strategy;
+const jwt             = require('jsonwebtoken');
+const expressJwt      = require('express-jwt');
+const blacklist       = require('express-jwt-blacklist');
+const UserModel       = require('../models/user');
+const presenter       = require('../presenters/presenter');
 
 
 passport.use(new LocalStrategy(
@@ -15,15 +15,15 @@ passport.use(new LocalStrategy(
 		usernameField: 'login',
 		passwordField: 'password'
 	},
-	function(login, password, callback) {
-		UserModel.findOne({ login: login }, function (err, user) {
+	(login, password, callback) => {
+		UserModel.findOne({ login: login }, (err, user) => {
 			if (err) { return callback(err); }
 
 			// No user found with that login
 			if (!user) { return callback(null, false); }
 
 			// Make sure the password is correct
-			user.verifyPassword(password, function(err, isMatch) {
+			user.verifyPassword(password, (err, isMatch) => {
 				if (err) { return callback(err); }
 
 				// Password did not match
@@ -36,12 +36,12 @@ passport.use(new LocalStrategy(
 	}
 ));
 
-passport.serializeUser(function(user, cb) {
+passport.serializeUser((user, cb) => {
 	cb(null, user.id);
 });
 
-passport.deserializeUser(function(id, cb) {
-	UserModel.findById(id, function (err, user) {
+passport.deserializeUser((id, cb) => {
+	UserModel.findById(id, (err, user) => {
 		if (err) { return cb(err); }
 		cb(null, user);
 	});
@@ -52,7 +52,7 @@ module.exports.passport = passport;
 module.exports.loginUser = passport.authenticate('local', { session : false });
 module.exports.isAuth = expressJwt({ secret: 'bbuttons with nodejs' });
 
-module.exports.generateToken = function(req, res, next) {
+module.exports.generateToken = (req, res, next) => {
 	req.token = jwt.sign({ id: req.user.id }, 'bbuttons with nodejs', {
 		expiresIn: '1d'
 	});
@@ -60,7 +60,7 @@ module.exports.generateToken = function(req, res, next) {
 };
 
 
-module.exports.respond = function(req, res) {
+module.exports.respond = (req, res) => {
 	res.json(presenter.success({
 		user: req.user,
 		token: req.token
@@ -68,24 +68,24 @@ module.exports.respond = function(req, res) {
 };
 
 
-module.exports.isRevokedCallback = function(req, payload, done){
-	var issuer = payload.iss;
-	var tokenId = payload.jti;
+module.exports.isRevokedCallback = (req, payload, done) => {
+	const issuer = payload.iss;
+	const tokenId = payload.jti;
 
-	data.getRevokedToken(issuer, tokenId, function(err, token){
+	data.getRevokedToken(issuer, tokenId, (err, token) => {
 		if (err) { return done(err); }
 		return done(null, !!token);
 	});
 };
 
 
-module.exports.logout = function(req, res) {
+module.exports.logout = (req, res) => {
 	blacklist.revoke(req.user);
 	res.json(presenter.success(null));
 };
 
 
-module.exports.unauthHandler = function (err, req, res, next) {
+module.exports.unauthHandler = (err, req, res, next) => {
 	if (err.name === 'UnauthorizedError') {
 		res.json(presenter.fail(null, `${err.name}: ${err.message}`));
 	}

@@ -1,71 +1,59 @@
 'use strict';
 
 
-var PostModel           = require('../models/post'),
-    StreamModel         = require('../models/stream'),
-    UserModel           = require('../models/user'),
-    constants           = require('../constants'),
-    commentService      = require('../services/comment'),
-    ServiceException    = require('../exceptions/service-exception');
+const PostModel           = require('../models/post');
+const StreamModel         = require('../models/stream');
+const UserModel           = require('../models/user');
+const constants           = require('../constants');
+const commentService      = require('../services/comment');
+const ServiceException    = require('../exceptions/service-exception');
 
-module.exports.createPost = function (userId, postText) {
-    var userData;
+module.exports.createPost = (userId, postText) => {
+    let userData;
     return UserModel.findById(userId).exec()
-        .then(function (user) {
+        .then(user => {
             if (!user) {
                 throw new ServiceException(`User with id ${userId} is not found`);
             }
             userData = user;
             return StreamModel.findById(user.stream_id).exec();
         })
-        .then(function (stream) {
-            var newPost = new PostModel({
+        .then(stream => {
+            const newPost = new PostModel({
                 text: postText,
                 followers: stream.followers,
                 stream_id: stream._id
             });
             return newPost.save();
         })
-        .then(function (newPost) {
-            return new Promise(function (resolve) {
+        .then(newPost => (
+            new Promise(resolve => {
                 if (newPost) {
                     resolve({user: userData, post: newPost});
                 }
             })
-        });
+        ));
 };
 
 
-module.exports.getPostList = function (userId, queryData) {
+//Function for fetch post list of user stream.
+//Required parameters: size of list, offset in pages and user id
+//Sort is not required parameter, by default is 'date'
+module.exports.getPostList = (userId, size, offset, sort = 'date') => {
 
-    var sorting = constants.postSorting[queryData.sort] || constants.postSorting.date;
+    //Set sorting, if not exists then default
+    const sorting = constants.postSorting[sort] || constants.postSorting.date;
 
-    var posts, user, count;
+    let posts, user, count;
 
-    return new Promise(function (resolve, reject) {
-        var error;
-        if (!queryData.size) {
-            error = 'Query size is undefined. ';
-        }
-
-        if (!queryData.offset) {
-            error += 'Query offset is undefined.';
-        }
-
-        if (error) {
-            reject(new ServiceException(error));
-        }
-
-        resolve();
-    })
-        .then(function () {
-            return UserModel.findById(userId).exec();
-        })
-        .then(function (dbUser) {
+    return UserModel.findById(userId).exec()
+        .then(dbUser => {
             user = dbUser;
             if (!user) {
                 throw new ServiceException(`User with id ${userId} is not found`);
             }
+            //Find all posts with user' stream id in main stream or in followers
+            //list with bounds and sort it by 'sort' parameter
             return PostModel.find({
                 $or: [{
                     stream_id: dbUser.stream_id
@@ -74,12 +62,13 @@ module.exports.getPostList = function (userId, queryData) {
                 }]
             })
                 .sort(sorting)
-                .skip(queryData.size * queryData.offset)
-                .limit(queryData.size)
+                .skip(size * offset)
+                .limit(size)
                 .exec()
         })
-        .then(function (dbPosts) {
+        .then(dbPosts => {
             posts = dbPosts;
+            //Fetch count of all user' posts
             return PostModel.find({
                 $or: [{
                     stream_id: user.stream_id
@@ -90,12 +79,13 @@ module.exports.getPostList = function (userId, queryData) {
                 .count()
                 .exec()
         })
-        .then(function (dbCount) {
+        .then(dbCount => {
             count = dbCount;
-            return new Promise(function (resolve) {
-                posts.forEach(function (post, i) {
+            return new Promise(resolve => {
+                //Find last comments for each post
+                posts.forEach((post, i) => {
                     commentService.getCommentsPreview(post._id)
-                        .then(function (comments) {
+                        .then(comments => {
                             post.comments = comments;
                             if (posts.length == i) {
                                 resolve()
@@ -104,79 +94,70 @@ module.exports.getPostList = function (userId, queryData) {
                 });
             });
         })
-        .then(function () {
-            return new Promise(function (resolve) {
+        .then(() => (
+            new Promise(resolve => {
                 resolve({
                     posts: posts,
                     count: count,
                     user: user,
-                    offset: queryData.offset,
-                    size: queryData.size,
-                    sort: queryData.sort || 'date'
+                    offset: offset,
+                    size: size,
+                    sort: sort || 'date'
                 });
             })
-        });
+        ));
 };
 
 
-module.exports.editPost = function (authorizedUserId, userId, postId, text) {
-    var user;
-    return new Promise(function (resolve, reject) {
-        if (!text || !text.trim()) {
-            reject(new ServiceException('New text cannot be empty'));
-        }
-        if (authorizedUserId != userId) {
-            reject(new ServiceException('User cannot edit posts of another users'));
-        }
-        resolve();
-    })
-        .then(function () {
-            return UserModel.findById(userId).exec();
-        })
-        .then(function (dbUser) {
+//Function for update post text
+//Required parameters: user id, post id and new text of post
+module.exports.editPost = (userId, postId, text) => {
+    let user;
+    return UserModel.findById(userId).exec()
+        .then(dbUser => {
             user = dbUser;
             return PostModel.findById(postId).exec();
         })
-        .then(function (post) {
+        .then(post => {
+            //Is post exist check
             if (!post) {
                 throw new ServiceException(`Post with id ${postId} is not found`);
             }
+
+            //Is post belong to user check
             if (!user.stream_id.equals(post.stream_id)) {
                 throw new ServiceException('User cannot edit posts of another users');
             }
             post.text = text;
             return post.save();
         })
-        .then(function (updatedPost) {
-            return new Promise(function (resolve) {
+        .then(updatedPost => (
+            new Promise(resolve => {
                 resolve({
                     user: user,
                     post: updatedPost
                 });
             })
-        });
+        ));
 };
 
 
-module.exports.deletePost = function (authorizedUserId, userId, postId) {
-    var user;
-    return new Promise(function (resolve, reject) {
-        if (authorizedUserId != userId) {
-            reject(new ServiceException('User cannot remove posts of another users'));
-        }
-        resolve();
-    })
-        .then(function () {
-            return UserModel.findById(userId).exec();
-        })
-        .then(function (dbUser) {
+//Function for deletion user' post
+//Required parameters: user id and post id
+module.exports.deletePost = (userId, postId) => {
+    let user;
+    return UserModel.findById(userId).exec()
+        .then(dbUser => {
             user = dbUser;
             return PostModel.findById(postId).exec();
         })
-        .then(function (post) {
+        .then(post => {
+            //Check existing post
             if (!post) {
                 throw new ServiceException(`Post with id ${postId} is not found`);
             }
+
+            //Is post belong to user
             if (!user.stream_id.equals(post.stream_id)) {
                 throw new ServiceException('User cannot edit posts of another users');
             }
@@ -185,31 +166,28 @@ module.exports.deletePost = function (authorizedUserId, userId, postId) {
 };
 
 
-module.exports.togglePostLike = function (authorizedUserId, userId, postId) {
+module.exports.togglePostLike = (userId, postId) => {
     var user;
-    return new Promise(function (resolve, reject) {
-        if (authorizedUserId != userId) {
-            reject(new ServiceException('User cannot set likes as another user'));
-        }
-        resolve();
-    })
-        .then(function () {
-            return UserModel.findById(userId).exec();
-        })
-        .then(function (dbUser) {
+    return UserModel.findById(userId).exec()
+        .then(dbUser => {
             user = dbUser;
             return PostModel.findById(postId).exec();
         })
-        .then(function (post) {
+        .then(post => {
+            //Check post exist
             if (!post) {
                 throw new ServiceException(`Post with id ${postId} is not found`);
             }
-            var likeInPost = -1;
-            post.likes.forEach(function (item, i) {
+
+            //Search user id in post' likes
+            let likeInPost = -1;
+            post.likes.forEach((item, i) => {
                 if (item.user_id.equals(userId)) {
                     likeInPost = i;
                 }
             });
+
+            //If user id in likes then pop it otherwise push
             if (likeInPost === -1) {
                 post.likes.push({user_id: userId});
             } else {
@@ -217,12 +195,12 @@ module.exports.togglePostLike = function (authorizedUserId, userId, postId) {
             }
             return post.save();
         })
-        .then(function (updatedPost) {
-            return new Promise(function (resolve) {
+        .then(updatedPost => (
+            new Promise(function (resolve) {
                 resolve({
                     user: user,
                     post: updatedPost
                 })
             })
-        });
+        ));
 };

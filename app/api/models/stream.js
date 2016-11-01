@@ -1,11 +1,11 @@
 'use strict';
 
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var streamSchema = new Schema({
+const streamSchema = new Schema({
 	followers: [{ stream_id: {
 		type: Schema.Types.ObjectId,
 		index: true

@@ -1,10 +1,10 @@
 'use strict';
 
 
-var express           = require('express'),
-    auth              = require('../controllers/auth');
+const express      = require('express');
+const auth         = require('../controllers/auth');
 
-var router = express.Router();
+const router = express.Router();
 
 router.post('/login', auth.loginUser, auth.generateToken, auth.respond);
 router.get('/logout', auth.isAuth, auth.logout);

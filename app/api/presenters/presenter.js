@@ -1,20 +1,20 @@
 'use strict';
 
 
-var ServiceException = require('../exceptions/service-exception');
+const ServiceException = require('../exceptions/service-exception');
 
 
-module.exports.success = function(data) {
-    return {
+module.exports.success = data => (
+    {
         success: true,
         error: null,
         data: data
     }
-};
+);
 
 
-module.exports.fail = function(err, msg) {
-    var error;
+module.exports.fail = (err, msg) => {
+    let error;
     if (err instanceof ServiceException) {
         error = err.message;
     } else {
@@ -24,14 +24,5 @@ module.exports.fail = function(err, msg) {
         success: false,
         error: error,
         data: null
-    }
-};
-
-
-module.exports.failWithData = function(data, msg) {
-    return {
-        success: false,
-        error: msg,
-        data: data
     }
 };

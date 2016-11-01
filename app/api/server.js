@@ -1,22 +1,22 @@
 'use strict';
 
-var express          = require('express'),
-    mongoose         = require('mongoose'),
-	bodyParser       = require('body-parser'),
-	morgan           = require('morgan'),
-    passport         = require('./controllers/auth').passport,
-	unauthHandler    = require('./controllers/auth').unauthHandler,
-    userRouter       = require('./routes/user'),
-    authRouter       = require('./routes/auth'),
-	postRouter       = require('./routes/post');
+const express          = require('express');
+const mongoose         = require('mongoose');
+const bodyParser       = require('body-parser');
+const morgan           = require('morgan');
+const passport         = require('./controllers/auth').passport;
+const unauthHandler    = require('./controllers/auth').unauthHandler;
+const userRouter       = require('./routes/user');
+const authRouter       = require('./routes/auth');
+const postRouter       = require('./routes/post');
 
-var app = express();
+const app = express();
 
-var dbUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.DATABASE_NAME}`;
+const dbUrl = `mongodb://${process.env.DATABASE_USER}:${process.env.MONGODB_PASS}@mongodb:27017/${process.env.DATABASE_NAME}`;
 
 mongoose.Promise = global.Promise;
 
-function tryToConnectDB() {
+const tryToConnectDB = () => {
 	mongoose.connect(dbUrl, function(error) {
 		if (!error) {
 			console.log('DB connection complete');
@@ -25,9 +25,9 @@ function tryToConnectDB() {
 		}	
 		console.log('Waiting for db connect...');
 	});	
-}
+};
 
-var intervalId = setInterval(tryToConnectDB, 1000);
+const intervalId = setInterval(tryToConnectDB, 1000);
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({

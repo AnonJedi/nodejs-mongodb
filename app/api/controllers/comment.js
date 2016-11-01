@@ -1,18 +1,18 @@
 'use strict';
 
 
-var commentService    = require('../services/comment'),
-    presenter         = require('../presenters/presenter');
+const commentService    = require('../services/comment');
+const presenter         = require('../presenters/presenter');
 
 
-module.exports.createComment = function (req, res) {
+module.exports.createComment = (req, res) => {
     commentService.createComment(
         req.user.id, req.params.userId,
         req.params.postId, req.body.text)
-        .then(function (data) {
+        .then((data) => {
             res.json(presenter.success(data));
         })
-        .catch(function (err) {
+        .catch((err) => {
             console.log(err);
             res.json(presenter.fail(err, 'Error occurred while creating comment'));
         });

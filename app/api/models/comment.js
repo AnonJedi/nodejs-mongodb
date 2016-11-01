@@ -1,11 +1,11 @@
 'use strict';
 
 
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var commentSchema = new Schema({
+const commentSchema = new Schema({
 	author: Schema.Types.Mixed,
 	post_id: {
 		type: Schema.Types.ObjectId,
@@ -24,4 +24,4 @@ var commentSchema = new Schema({
 
 
 
-module.exports = mongoose.model('comments', commentSchema);
+export default mongoose.model('comments', commentSchema);

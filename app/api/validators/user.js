@@ -1,27 +1,20 @@
 'use strict';
 
 
-var isValidObjectId = require('mongoose').Types.ObjectId.isValid;
-
-
-module.exports.createUser = function (data) {
+module.exports.validateCreateUser = data => {
+    let parsedData = {};
     if (!data) {
-        return 'User data is required';
+        parsedData.err.data = 'User data is required';
     }
 
-    var fields = ['login', 'password', 'firstname', 'lastname'];
+    const fields = ['login', 'password', 'firstname', 'lastname'];
 
-    var errors;
-
-    fields.forEach(function (field) {
-        if (!data[field]) {
-            errors[field] = `${field} is required`;
+    fields.forEach(field => {
+        if (!data[field] || !data[field].trim()) {
+            parsedData.err[field] = `${field} is required`;
         }
+        parsedData[field] = data[field];
     });
-    return errors;
-};
 
-
-module.exports.validateUserId = function (userId) {
-    return isValidObjectId(userId);
+    return parsedData;
 };

@@ -1,18 +1,18 @@
 'use strict';
 
 
-var userService        = require('../services/user'),
-	presenter          = require('../presenters/presenter'),
-	validators         = require('../validators/user');
+const userService        = require('../services/user');
+const presenter          = require('../presenters/presenter');
+const validators         = require('../validators/user');
 
 
 //Getting list of all users
-module.exports.getAllUsers = function(req, res) {
+module.exports.getAllUsers = (req, res) => {
 	userService.getAllUsers()
-		.then(function(users) {
+		.then(users => {
 			res.json(presenter.success(users));
 		})
-		.catch(function(err) {
+		.catch(err => {
 			console.log(err);
 			res.json(presenter.fail(err, 'Error occurred while fetching user list'));
 		});
@@ -20,10 +20,10 @@ module.exports.getAllUsers = function(req, res) {
 
 
 //Getting user by user id
-module.exports.getUser = function(req, res) {
+module.exports.getUser = (req, res) => {
 	//Validation of user id
-	if (!validators.validateUserId(req.params.userId)) {
-		var err = `User id '${req.params.userId}' is not valid`;
+	if (!validateObjectId(req.params.userId)) {
+		const err = `User id '${req.params.userId}' is not valid`;
 		console.log(err);
 		res.json(presenter.fail(null, err));
 		return;
@@ -31,10 +31,10 @@ module.exports.getUser = function(req, res) {
 
 	//Fetch user if user id is valid
 	userService.getUser(req.params.userId)
-		.then(function(user) {
+		.then(user => {
 			res.json(presenter.success(user));
 		})
-		.catch(function(err) {
+		.catch(err => {
 			console.log(err);
 			res.json(presenter.fail(err, 'Error occurred while fetching user'));
 		});
@@ -42,22 +42,22 @@ module.exports.getUser = function(req, res) {
 
 
 //Creation new user
-module.exports.createUser = function(req, res) {
+module.exports.createUser = (req, res) => {
 	//Validation of user data like
 	//login, password, firstname, lastname
-	var err = validators.createUser(req.body);
-	if (err) {
-		console.log('User creation error:', err);
-		res.json(presenter.fail(null, err));
+	const parsedData = validateCreateUser(req.body);
+	if (parsedData.err) {
+		console.log('User creation error:', parsedData.err);
+		res.json(presenter.fail(null, parsedData.err));
 		return;
 	}
 
 	//Create user if data are valid
-	userService.createUser(req.body)
-		.then(function(user) {
+	userService.createUser(parsedData)
+		.then(user => {
 			res.json(presenter.success(user));
 		})
-		.catch(function(err) {
+		.catch(err => {
 			console.log(err);
 			res.json(presenter.fail(err, 'Error occurred while creating user'));
 		});
@@ -65,13 +65,13 @@ module.exports.createUser = function(req, res) {
 
 
 //Create following for user
-module.exports.createFollower = function(req, res) {
+module.exports.createFollower = (req, res) => {
 	//Validate user id and following user id
-	var err;
-	if (!validators.validateUserId(req.params.userId)) {
+	let err;
+	if (!commonValidator.validateObjectId(req.params.userId)) {
 		err.userId = 'User id is not valid';
 	}
-	if (!validators.validateUserId(req.params.followingUserId)) {
+	if (!commonValidator.validateObjectId(req.params.followingUserId)) {
 		err.followingUserId = 'Following user id is not valid';
 	}
 
@@ -83,10 +83,10 @@ module.exports.createFollower = function(req, res) {
 
 	//Create link between users if ids are valid
 	userService.createFollower(req.params.userId, req.params.followingUserId)
-		.then(function() {
+		.then(() => {
 			res.json(presenter.success(null));
 		})
-		.catch(function(err) {
+		.catch(err => {
 			console.log(err);
 			res.json(presenter.fail(err, 'Error occurred while creating follower'));
 		});
@@ -94,13 +94,13 @@ module.exports.createFollower = function(req, res) {
 
 
 //Removing following for user
-module.exports.removeFollower = function(req, res) {
+module.exports.removeFollower = (req, res) => {
 	//Validate user id and following user id
-	var err;
-	if (!validators.validateUserId(req.params.userId)) {
+	let err;
+	if (!commonValidator.validateObjectId(req.params.userId)) {
 		err.userId = 'User id is not valid';
 	}
-	if (!validators.validateUserId(req.params.followingUserId)) {
+	if (!commonValidator.validateObjectId(req.params.followingUserId)) {
 		err.followingUserId = 'Following user id is not valid';
 	}
 
@@ -112,10 +112,10 @@ module.exports.removeFollower = function(req, res) {
 
 	//Remove link between users if ids are valid
 	userService.removeFollower(req.params.userId, req.params.followingUserId)
-		.then(function() {
+		.then(() => {
 			res.json(presenter.success(null));
 		})
-		.catch(function(err) {
+		.catch(err => {
 			console.log(err);
 			res.json(presenter.fail(err, 'Error occurred while deleting follower'));
 		});
@@ -123,9 +123,9 @@ module.exports.removeFollower = function(req, res) {
 
 
 //Deleting user
-module.exports.deleteUser = function(req, res) {
+module.exports.deleteUser = (req, res) => {
 	//Validate user id
-	if (!validators.validateUserId(req.params.userId)) {
+	if (!commonValidator.validateObjectId(req.params.userId)) {
 		var err = `User id '${req.params.userId}' is not valid`;
 		console.log(err);
 		res.json(presenter.fail(null, err));
@@ -134,10 +134,10 @@ module.exports.deleteUser = function(req, res) {
 
 	//Delete user if his id is valid
 	userService.removeUser(req.user.id, req.params.userId)
-		.then(function() {
+		.then(() => {
 			res.json(presenter.success(null));
 		})
-		.catch(function(err) {
+		.catch((err) => {
 			console.log(err);
 			presenter.fail(err, 'Error occurred while deleting user');
 		})

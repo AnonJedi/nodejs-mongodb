@@ -1,12 +1,12 @@
 'use strict';
 
 
-var mongoose    = require('mongoose'),
-    bcrypt      = require('bcrypt');
+const mongoose    = require('mongoose');
+const bcrypt      = require('bcrypt');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var userSchema = new Schema({
+const userSchema = new Schema({
 	firstname: {
 		type: String,
 		required: true
@@ -32,8 +32,8 @@ var userSchema = new Schema({
 	}
 }, { autoIndex: false });
 
-userSchema.methods.verifyPassword = function(password, callback) {
-	bcrypt.compare(password, this.password, function(err, isMatch) {
+userSchema.methods.verifyPassword = function (password, callback) {
+	bcrypt.compare(password, this.password, (err, isMatch) => {
 		if (err) {
 			return callback(err);
 		}
