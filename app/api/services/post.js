@@ -5,7 +5,6 @@ const PostModel           = require('../models/post');
 const StreamModel         = require('../models/stream');
 const UserModel           = require('../models/user');
 const constants           = require('../constants');
-const commentService      = require('../services/comment');
 const ServiceException    = require('../exceptions/service-exception');
 
 module.exports.createPost = (userId, postText) => {
@@ -44,7 +43,7 @@ module.exports.getPostList = (userId, size, offset, sort = 'date') => {
     //Set sorting, if not exists then default
     const sorting = constants.postSorting[sort] || constants.postSorting.date;
 
-    let posts, user, count;
+    let posts, user;
 
     return UserModel.findById(userId).exec()
         .then(dbUser => {
@@ -79,22 +78,7 @@ module.exports.getPostList = (userId, size, offset, sort = 'date') => {
                 .count()
                 .exec()
         })
-        .then(dbCount => {
-            count = dbCount;
-            return new Promise(resolve => {
-                //Find last comments for each post
-                posts.forEach((post, i) => {
-                    commentService.getCommentsPreview(post._id)
-                        .then(comments => {
-                            post.comments = comments;
-                            if (posts.length == i) {
-                                resolve()
-                            }
-                        })
-                });
-            });
-        })
-        .then(() => (
+        .then(count => (
             new Promise(resolve => {
                 resolve({
                     posts: posts,

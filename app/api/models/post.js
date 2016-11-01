@@ -26,7 +26,8 @@ const postSchema = new Schema({
 	created_at: {
 		type : Date,
 		default: Date.now
-	}
+	},
+	comments: [{comment: Schema.Types.Mixed}]
 }, { autoIndex: false });
 
 

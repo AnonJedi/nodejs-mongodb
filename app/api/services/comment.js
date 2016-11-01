@@ -22,19 +22,10 @@ module.exports.getCommentsPreview = postId => (
 );
 
 
-module.exports.createComment = (authorizedUserId, userId, postId, text) => {
+module.exports.createComment = (userId, postId, text) => {
     let user, post;
 
-    return new Promise((resolve, reject) => {
-        if (authorizedUserId !== userId) {
-            reject(new ServiceException('User cannot comment post as another user'));
-        }
-        if (!text || !text.trim()) {
-            reject(new ServiceException('Comment text cannot be empty'));
-        }
-        resolve();
-    })
-        .then(() => UserModel.findById(userId).exec())
+    return UserModel.findById(userId).exec()
         .then(dbUser => {
             user = dbUser;
             return PostModel.findById(postId).exec();
@@ -50,11 +41,17 @@ module.exports.createComment = (authorizedUserId, userId, postId, text) => {
                 author: user
             }).save();
         })
-        .then(comment => (
+        .then(comment => {
+            if (post.comments.length == constants.previewCommentsCount) {
+                post.comments.shift();
+            }
+            return post.comments.push(comment).save();
+        })
+        .then(updatedPost => (
             new Promise(resolve => {
                 resolve({
-                    post: post,
-                    comment: comment
+                    post: updatedPost,
+                    comment: updatedPost.comments[constants.previewCommentsCount-1]
                 });
             })
         ));
@@ -70,3 +67,32 @@ const _compareObjects = (field, a, b) => {
     }
     return 0;
 };
+
+
+module.exports.editComment = (userId, commentId, text) => (
+    CommentModel.findById(commentId).exec()
+        .then(comment => {
+            if (!comment.author._id.equal(userId)) {
+                throw new ServiceException(`Comment with id '${commentId}' is 
+                    not belong to user with id '${userId}'`);
+            }
+            comment.text = text;
+            return comment.save();
+        })
+);
+
+
+module.exports.deleteComment = (userId, commentId) => (
+    CommentModel.findById(commentId).exec()
+        .then(comment => {
+            if (!comment) {
+                throw new ServiceException(`Comment with id '${commentId}' is not found`);
+            }
+
+            if (!comment.author._id.equal(userId)) {
+                throw new ServiceException('User cannot delete comments of another user');
+            }
+
+            return comment.remove();
+        })
+);

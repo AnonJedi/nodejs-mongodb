@@ -9,6 +9,7 @@ const unauthHandler    = require('./controllers/auth').unauthHandler;
 const userRouter       = require('./routes/user');
 const authRouter       = require('./routes/auth');
 const postRouter       = require('./routes/post');
+const commentRouter    = require('./routes/comment');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use(passport.session());
 app.use('/', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/users/:userId/posts', postRouter);
+app.use('/api/v1/users/:userId/', commentRouter);
 
 app.use(unauthHandler);
 
