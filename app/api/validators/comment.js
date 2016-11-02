@@ -57,7 +57,9 @@ module.exports.validateEditCommentData = data => {
 
 
 module.exports.validateDeletionCommentData = data => {
-    const parsedData = {};
+    const parsedData = {
+        err: {}
+    };
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot delete comment of another user';

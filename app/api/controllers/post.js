@@ -4,7 +4,6 @@
 const postService       = require('../services/post');
 const presenter         = require('../presenters/presenter');
 const validator         = require('../validators/post');
-const commonValidator   = require('../validators/common');
 
 
 module.exports.createPost = (req, res) => {
@@ -14,7 +13,7 @@ module.exports.createPost = (req, res) => {
         text: req.body.text
     };
     const parsedData = validator.validateCreatePostData(rawData);
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot create new post.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
@@ -40,7 +39,7 @@ module.exports.getPosts = (req, res) => {
     const parsedData = validator.validateGetPostListQuery(rawData);
 
     //If data contains 'err' field after validation -> send fail response
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot get post list.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
@@ -70,7 +69,7 @@ module.exports.editPost = (req, res) => {
     const parsedData = validator.validateEditPostData(rawData);
 
     //If parsed data contain 'err' field -> send fail response
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot edit post.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
@@ -98,7 +97,7 @@ module.exports.deletePost = (req, res) => {
     const parsedData = validator.validateDeletionOfPost(rawData);
 
     //If parsed data contain 'err' field -> send fail response
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot delete post.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
@@ -126,7 +125,7 @@ module.exports.togglePostLike = (req, res) => {
     const parsedData = validator.validateTogglePostLikeData(rawData);
 
     //If parsed data contain 'err' field -> send fail response
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot toggle like.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;

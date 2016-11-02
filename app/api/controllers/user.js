@@ -45,7 +45,7 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
 	//Validation of user data like
 	//login, password, firstname, lastname
-	const parsedData = validateCreateUser(req.body);
+	const parsedData = validators.validateCreateUser(req.body);
 	if (parsedData.err) {
 		console.log('User creation error:', parsedData.err);
 		res.json(presenter.fail(null, parsedData.err));

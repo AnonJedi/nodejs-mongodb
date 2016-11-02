@@ -49,4 +49,6 @@ app.use(unauthHandler);
 
 const port = process.env.NODE_ENV == 'test' ? process.env.TEST_PORT : process.env.PORT;
 
+console.log(`Application port is ${port}`);
+
 app.listen(port);

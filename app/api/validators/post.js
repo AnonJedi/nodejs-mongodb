@@ -5,27 +5,30 @@ const commonValidator   = require('./common');
 
 
 module.exports.validateCreatePostData = data => {
-    let parsedData = {};
-
+    const parsedData = {
+        err: {}
+    };
     if (data.authorizedUserId != data.userId) {
         parsedData.err.authorizedUserId = 'User cannot create post for another user';
     }
     if (!commonValidator.validateObjectId(data.userId)) {
         parsedData.err.userId = `User id '${data.userId}' is not valid`;
     }
-    parsedPata.userId = data.userId;
+
+    parsedData.userId = data.userId;
 
     if (!data.text || !data.text.trim()) {
         parsedData.err.text = 'Post text cannot be empty';
     }
     parsedData.text = data.text;
+    console.log(parsedData);
 
     return parsedData;
 };
 
 
 module.exports.validateGetPostListQuery = data => {
-    let parsedData = commonValidator.validatePageQueryData(data);
+    const parsedData = commonValidator.validatePageQueryData(data);
 
     if (!commonValidator.validateObjectId(data.userId)) {
         parsedData.err.userId = `User id '${data.userId}' is not valid`;
@@ -37,7 +40,9 @@ module.exports.validateGetPostListQuery = data => {
 
 
 module.exports.validateEditPostData = data => {
-    let parsedData = {};
+    const parsedData = {
+        err: {}
+    };
     if (!data.text || !data.text.trim()) {
         parsedData.err.text = 'New text cannot be empty';
     }
@@ -64,7 +69,9 @@ module.exports.validateEditPostData = data => {
 
 
 module.exports.validateDeletionOfPost = data => {
-    let parsedData = {};
+    const parsedData = {
+        err: {}
+    };
     if (data.authorizedUserId != data.userId) {
         parsedData.err.authorizedUserId = 'User cannot remove posts of another users';
     }
@@ -83,7 +90,9 @@ module.exports.validateDeletionOfPost = data => {
 
 
 module.exports.validateTogglePostLikeData = function (data) {
-    var parsedData = {};
+    const parsedData = {
+        err: {}
+    };
     if (data.authorizedUserId != data.userId) {
         parsedData.err.authorizedUserId = 'User cannot set likes as another user';
     }

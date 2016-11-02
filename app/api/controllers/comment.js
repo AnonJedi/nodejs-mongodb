@@ -15,7 +15,7 @@ module.exports.createComment = (req, res) => {
         text: req.body.text
     };
     const parsedData = validator.validateCreateCommentData(rawData);
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot create comment.', parsedData.err);
         req.json(presenter.fail(null, parsedData.err));
         return;
@@ -57,13 +57,20 @@ module.exports.getCommentsPage = (req, res) => {
         postId: req.params.postId
     });
     const parsedData = validator.validateGetCommentListData(rawData);
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot get comments list.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
     }
 
-    commentService
+    commentService.getCommentList(parsedData.postId, parsedData.size, parsedData.offset)
+        .then(data => {
+            res.json(presenter.success(data));
+        })
+        .catch(err => {
+            console.log(err);
+            res.json(presenter.fail(err, 'Error occurred while fetching comments list'));
+        })
 };
 
 
@@ -75,7 +82,7 @@ module.exports.editComment = (req, res) => {
         text: req.body.text
     };
     const parsedData = validator.validateEditCommentData(rawData);
-    if (parsedData.err) {
+    if (Object.keys(parsedData.err).length) {
         console.log('Cannot edit comment.', parsedData.err);
         res.json(presenter.fail(null, parsedData.err));
         return;
@@ -99,6 +106,11 @@ module.exports.deleteComment = (req, res) => {
         commentId: req.params.commentId
     };
     const parsedData = validator.validateDeletionCommentData(rawData);
+    if (Object.keys(parsedData.err).length) {
+        console.log('Cannot delete comments', parsedData.err);
+        res.json(presenter.fail(null, parsedData.err));
+        return;
+    }
 
     commentService.deleteComment(parsedData.userId, parsedData.commentId)
         .then(() => {
