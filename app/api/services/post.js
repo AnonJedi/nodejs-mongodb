@@ -1,11 +1,12 @@
 'use strict';
 
 
-const PostModel           = require('../models/post');
-const StreamModel         = require('../models/stream');
-const UserModel           = require('../models/user');
-const constants           = require('../constants');
-const ServiceException    = require('../exceptions/service-exception');
+const PostModel = require('../models/post');
+const StreamModel = require('../models/stream');
+const UserModel = require('../models/user');
+const CommentModel = require('../models/comment');
+const constants = require('../constants');
+const ServiceException = require('../exceptions/service-exception');
 
 module.exports.createPost = (userId, postText) => {
     let userData;
@@ -129,24 +130,28 @@ module.exports.editPost = (userId, postId, text) => {
 //Function for deletion user' post
 //Required parameters: user id and post id
 module.exports.deletePost = (userId, postId) => {
-    let user;
+    let user, post;
     return UserModel.findById(userId).exec()
         .then(dbUser => {
             user = dbUser;
             return PostModel.findById(postId).exec();
         })
-        .then(post => {
+        .then(dbPost => {
             //Check existing post
-            if (!post) {
+            if (!dbPost) {
                 throw new ServiceException(`Post with id ${postId} is not found`);
             }
-
+            post = dbPost;
             //Is post belong to user
             if (!user.stream_id.equals(post.stream_id)) {
-                throw new ServiceException('User cannot edit posts of another users');
+                throw new ServiceException('User cannot remove posts of another users');
             }
-            return PostModel.remove({ _id: postId });
-        });
+
+            return CommentModel.remove({post_id: postId});
+        })
+        .then(() => (
+            post.remove()
+        ));
 };
 
 

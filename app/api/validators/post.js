@@ -25,24 +25,12 @@ module.exports.validateCreatePostData = data => {
 
 
 module.exports.validateGetPostListQuery = data => {
-    let parsedData = {};
-    if (!data.size) {
-        parsedData.err.size = 'Query size is undefined.';
-    } else {
-        parsedData.size = Number.parseInt(data.size);
-        if (!parsedData.size) {
-            parsedData.err.size = 'Size parameter is not valid. Need integer number';
-        }
-    }
+    let parsedData = commonValidator.validatePageQueryData(data);
 
-    if (!data.offset) {
-        parsedData.err.offset = 'Query offset is undefined.';
-    } else {
-        parsedData.size = Number.parseInt(data.offset);
-        if (!parsedData.offset) {
-            parsedData.err.offset = 'Offset parameter is not valid. Need integer number';
-        }
+    if (!commonValidator.validateObjectId(data.userId)) {
+        parsedData.err.userId = `User id '${data.userId}' is not valid`;
     }
+    parsedData.userId = data.userId;
 
     return parsedData;
 };

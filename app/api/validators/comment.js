@@ -5,7 +5,7 @@ const commonValidator = require('./common');
 
 
 module.exports.validateCreateCommentData = data => {
-    let parsedData = {};
+    const parsedData = {};
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot comment post as another user';
@@ -31,7 +31,7 @@ module.exports.validateCreateCommentData = data => {
 
 
 module.exports.validateEditCommentData = data => {
-    let parsedData = {};
+    const parsedData = {};
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot edit comment of another user';
@@ -57,7 +57,7 @@ module.exports.validateEditCommentData = data => {
 
 
 module.exports.validateDeletionCommentData = data => {
-    let parsedData = {};
+    const parsedData = {};
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot delete comment of another user';
@@ -71,6 +71,18 @@ module.exports.validateDeletionCommentData = data => {
         parsedData.err.commentId = `Comment id '${data.commentId}' is not valid`;
     }
     parsedData.commentId = data.commentId;
+
+    return parsedData;
+};
+
+
+module.exports.validateGetCommentListData = data => {
+    const parsedData = commonValidator.validatePageQueryData(data);
+
+    if (!commonValidator.validateObjectId(data.postId)) {
+        parsedData.err.postId = `Post id '${data.postId}' is not valid`;
+    }
+    parsedData.postId = data.postId;
 
     return parsedData;
 };

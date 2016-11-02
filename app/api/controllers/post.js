@@ -35,13 +35,9 @@ module.exports.createPost = (req, res) => {
 
 
 module.exports.getPosts = (req, res) => {
+    const rawData = Object.assign(req.query, {userId: req.params.userId});
     //Validate and parse data for getting post list
-    const parsedData = validator.validateGetPostListQuery(req.query);
-
-    //Validate user id
-    if (!commonValidator.validateObjectId(req.params.userId)) {
-        parsedData.err.userId = `User id '${req.params.userId}' is not valid`;
-    }
+    const parsedData = validator.validateGetPostListQuery(rawData);
 
     //If data contains 'err' field after validation -> send fail response
     if (parsedData.err) {
@@ -49,7 +45,6 @@ module.exports.getPosts = (req, res) => {
         res.json(presenter.fail(null, parsedData.err));
         return;
     }
-    parsedData.userId = req.params.userId;
 
     //If all validation is done fetch posts
     postService.getPostList(parsedData.userId, parsedData.size, parsedData.offset, parsedData.sort)

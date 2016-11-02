@@ -4,6 +4,7 @@
 const commentService    = require('../services/comment');
 const presenter         = require('../presenters/presenter');
 const validator         = require('../validators/comment');
+const commonValidator   = require('../validators/common');
 
 
 module.exports.createComment = (req, res) => {
@@ -28,6 +29,41 @@ module.exports.createComment = (req, res) => {
             console.log(err);
             res.json(presenter.fail(err, 'Error occurred while creating comment'));
         });
+};
+
+
+module.exports.getComment = (req, res) => {
+    if (!commonValidator.validateObjectId(req.params.commentId)) {
+        const err = `Comment id '${req.params.commentId}' is not valid`;
+        console.log(err);
+        res.json(presenter.fail(null, err));
+        return;
+    }
+
+    commentService.getComment(req.params.commentId)
+        .then(data => {
+            res.json(presenter.success(data));
+        })
+        .catch(err =>  {
+            console.log(err);
+            res.json(presenter.fail(err, 'Error occurred while getting comment'));
+        });
+};
+
+
+module.exports.getCommentsPage = (req, res) => {
+    const rawData = Object.assign(req.query, {
+        userId: req.params.userId,
+        postId: req.params.postId
+    });
+    const parsedData = validator.validateGetCommentListData(rawData);
+    if (parsedData.err) {
+        console.log('Cannot get comments list.', parsedData.err);
+        res.json(presenter.fail(null, parsedData.err));
+        return;
+    }
+
+    commentService
 };
 
 
