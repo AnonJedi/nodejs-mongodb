@@ -45,15 +45,15 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
 	//Validation of user data like
 	//login, password, firstname, lastname
-	const parsedData = validators.validateCreateUser(req.body);
-	if (parsedData.err) {
+	const parsedData = validators.validateCreateUserData(req.body);
+	if (Object.keys(parsedData.err).length) {
 		console.log('User creation error:', parsedData.err);
 		res.json(presenter.fail(null, parsedData.err));
 		return;
 	}
 
 	//Create user if data are valid
-	userService.createUser(parsedData)
+	userService.createUser(parsedData.login, parsedData.password, parsedData.firstname, parsedData.lastname)
 		.then(user => {
 			res.json(presenter.success(user));
 		})
@@ -67,22 +67,21 @@ module.exports.createUser = (req, res) => {
 //Create following for user
 module.exports.createFollower = (req, res) => {
 	//Validate user id and following user id
-	let err;
-	if (!commonValidator.validateObjectId(req.params.userId)) {
-		err.userId = 'User id is not valid';
-	}
-	if (!commonValidator.validateObjectId(req.params.followingUserId)) {
-		err.followingUserId = 'Following user id is not valid';
-	}
+	const rawData = {
+		authorizedUserId: req.user.id,
+		userId: req.params.userId,
+		trackedUserId: req.params.followingUserId
+	};
+	const parsedData = validators.validateFollowData(rawData);
 
-	if (err) {
-		console.log('Error of follower creation.', err);
-		res.json(presenter.fail(null, err));
+	if (Object.keys(parsedData.err).length) {
+		console.log('Error of follower remove.', parsedData.err);
+		res.json(presenter.fail(null, parsedData.err));
 		return;
 	}
 
 	//Create link between users if ids are valid
-	userService.createFollower(req.params.userId, req.params.followingUserId)
+	userService.createFollower(parsedData.userId, parsedData.trackedUserId)
 		.then(() => {
 			res.json(presenter.success(null));
 		})
@@ -96,22 +95,21 @@ module.exports.createFollower = (req, res) => {
 //Removing following for user
 module.exports.removeFollower = (req, res) => {
 	//Validate user id and following user id
-	let err;
-	if (!commonValidator.validateObjectId(req.params.userId)) {
-		err.userId = 'User id is not valid';
-	}
-	if (!commonValidator.validateObjectId(req.params.followingUserId)) {
-		err.followingUserId = 'Following user id is not valid';
-	}
+	const rawData = {
+		authorizedUserId: req.user.id,
+		userId: req.params.userId,
+		trackedUserId: req.params.followingUserId
+	};
+	const parsedData = validators.validateFollowData(rawData);
 
-	if (err) {
-		console.log('Error of follower remove.', err);
-		res.json(presenter.fail(null, err));
+	if (Object.keys(parsedData.err).length) {
+		console.log('Error of follower remove.', parsedData.err);
+		res.json(presenter.fail(null, parsedData.err));
 		return;
 	}
 
 	//Remove link between users if ids are valid
-	userService.removeFollower(req.params.userId, req.params.followingUserId)
+	userService.removeFollower(parsedData.userId, parsedData.trackedUserId)
 		.then(() => {
 			res.json(presenter.success(null));
 		})
@@ -124,16 +122,21 @@ module.exports.removeFollower = (req, res) => {
 
 //Deleting user
 module.exports.deleteUser = (req, res) => {
-	//Validate user id
-	if (!commonValidator.validateObjectId(req.params.userId)) {
-		var err = `User id '${req.params.userId}' is not valid`;
-		console.log(err);
-		res.json(presenter.fail(null, err));
+	const rawData = {
+		userId: req.params.userId,
+		authorizedUserId: req.user.id
+	};
+
+	const parsedData = validators.validateDeleteUserData(rawData);
+
+	if (Object.keys(parsedData.err).length) {
+		console.log(parsedData.err);
+		res.json(presenter.fail(null, parsedData.err));
 		return;
 	}
 
 	//Delete user if his id is valid
-	userService.removeUser(req.user.id, req.params.userId)
+	userService.removeUser(parsedData.userId)
 		.then(() => {
 			res.json(presenter.success(null));
 		})
