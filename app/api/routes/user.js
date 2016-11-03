@@ -1,10 +1,9 @@
 'use strict';
 
-const express           = require('express');
+const router            = require('express').Router();
 const userController    = require('../controllers/user');
 const isAuth            = require('../controllers/auth').isAuth;
 
-const router = express.Router();
 
 router.get('/', isAuth, userController.getAllUsers);
 router.post('/new', userController.createUser);

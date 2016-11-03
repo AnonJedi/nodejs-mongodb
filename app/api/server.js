@@ -5,11 +5,11 @@ const mongoose         = require('mongoose');
 const bodyParser       = require('body-parser');
 const morgan           = require('morgan');
 const passport         = require('./controllers/auth').passport;
-const unauthHandler    = require('./controllers/auth').unauthHandler;
 const userRouter       = require('./routes/user');
 const authRouter       = require('./routes/auth');
 const postRouter       = require('./routes/post');
 const commentRouter    = require('./routes/comment');
+const errorHandlers   = require('./controllers/error');
 
 const app = express();
 
@@ -44,8 +44,10 @@ app.use('/', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/users/:userId/posts', postRouter);
 app.use('/api/v1/users/:userId/', commentRouter);
+app.use('*', errorHandlers.notFoundHandler);
 
-app.use(unauthHandler);
+
+app.use(errorHandlers.unauthHandler);
 
 const port = process.env.NODE_ENV == 'test' ? process.env.TEST_PORT : process.env.PORT;
 

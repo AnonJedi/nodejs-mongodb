@@ -83,10 +83,3 @@ module.exports.logout = (req, res) => {
 	blacklist.revoke(req.user);
 	res.json(presenter.success(null));
 };
-
-
-module.exports.unauthHandler = (err, req, res, next) => {
-	if (err.name === 'UnauthorizedError') {
-		res.json(presenter.fail(null, `${err.name}: ${err.message}`));
-	}
-};
