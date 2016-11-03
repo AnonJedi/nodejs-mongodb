@@ -4,6 +4,7 @@
 const postService       = require('../services/post');
 const presenter         = require('../presenters/presenter');
 const validator         = require('../validators/post');
+const commonValidator   = require('../validators/common');
 
 
 module.exports.createPost = (req, res) => {
@@ -29,6 +30,25 @@ module.exports.createPost = (req, res) => {
         .catch((err) => {
             console.log(err);
             res.json(presenter.fail(err, 'Error occurred while creating new post'));
+        });
+};
+
+
+module.exports.getPost = (req, res) => {
+    if (!commonValidator.validateObjectId(req.params.postId)) {
+        const err = `Post id '${req.params.postId}' is not valid`;
+        console.log(err);
+        res.json(presenter.fail(null, err));
+        return;
+    }
+
+    postService.getPost(req.params.postId)
+        .then(data => {
+            res.json(presenter.success(data));
+        })
+        .catch(err => {
+            console.log(err);
+            res.json(presenter.fail(err, 'Error occurred while getting post'));
         });
 };
 

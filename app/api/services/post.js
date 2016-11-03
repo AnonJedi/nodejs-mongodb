@@ -36,6 +36,21 @@ module.exports.createPost = (userId, postText) => {
 };
 
 
+module.exports.getPost = postId => (
+    PostModel.findById(postId).exec()
+        .then(post => {
+            if (!post) {
+                throw new ServiceException(`Post with id '${postId}' is not found`);
+            }
+            return new Promise(resolve => {
+                resolve({
+                    post: post
+                })
+            });
+        })
+);
+
+
 //Function for fetch post list of user stream.
 //Required parameters: size of list, offset in pages and user id
 //Sort is not required parameter, by default is 'date'
