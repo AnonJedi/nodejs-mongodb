@@ -19,6 +19,10 @@ const commentSchema = new Schema({
 	created_at: {
 		type : Date,
 		default: Date.now
+	},
+	text: {
+		type: String,
+		required: true
 	}
 }, { autoIndex: false });
 

@@ -39,7 +39,7 @@ module.exports.getCommentList = (postId, size, offset) => {
             }
             post = dbPost;
             return CommentModel.find({post_id: postId})
-                .filter('created_at')
+                .sort('created_at')
                 .skip(offset * size)
                 .limit(size)
                 .exec()
@@ -65,7 +65,7 @@ module.exports.getCommentList = (postId, size, offset) => {
 
 
 module.exports.createComment = (userId, postId, text) => {
-    let user, post;
+    let user, post, comment;
 
     return UserModel.findById(userId).exec()
         .then(dbUser => {
@@ -83,17 +83,19 @@ module.exports.createComment = (userId, postId, text) => {
                 author: user
             }).save();
         })
-        .then(comment => {
+        .then(dbComment => {
+            comment = dbComment;
             if (post.comments.length == constants.previewCommentsCount) {
                 post.comments.shift();
             }
-            return post.comments.push(comment).save();
+            post.comments.push({comment: comment});
+            return post.save();
         })
         .then(updatedPost => (
             new Promise(resolve => {
                 resolve({
                     post: updatedPost,
-                    comment: updatedPost.comments[constants.previewCommentsCount - 1]
+                    comment: comment
                 });
             })
         ));
@@ -114,7 +116,7 @@ const _compareObjects = (field, a, b) => {
 module.exports.editComment = (userId, commentId, text) => (
     CommentModel.findById(commentId).exec()
         .then(comment => {
-            if (!comment.author._id.equal(userId)) {
+            if (!comment.author._id == userId) {
                 throw new ServiceException(`Comment with id '${commentId}' is 
                     not belong to user with id '${userId}'`);
             }
@@ -126,13 +128,13 @@ module.exports.editComment = (userId, commentId, text) => (
 
 module.exports.deleteComment = (userId, commentId) => {
     let post, comment;
-    CommentModel.findById(commentId).exec()
+    return CommentModel.findById(commentId).exec()
         .then(dbComment => {
             if (!dbComment) {
                 throw new ServiceException(`Comment with id '${commentId}' is not found`);
             }
 
-            if (!dbComment.author._id.equal(userId)) {
+            if (!dbComment.author._id == userId) {
                 throw new ServiceException('User cannot delete comments of another user');
             }
             comment = dbComment;
@@ -143,21 +145,19 @@ module.exports.deleteComment = (userId, commentId) => {
                 return CommentModel.remove({post_id: comment.post_id});
             }
             post = dbPost;
-
-            let isCommentInPostPreview = post.comments.filter(item => item._id.equal(comment._id));
-            if (isCommentInPostPreview.length == 0) {
-                return comment.remove();
+            return comment.remove();
+        })
+        .then(() => {
+            let isCommentInPostPreview = post.comments.filter(item => item.comment._id.equals(commentId));
+            if (isCommentInPostPreview.length) {
+                return _refreshCommentsOfPost(post);
             }
-            return _refreshCommentsOfPost(post);
+            return new Promise(resolve => { resolve(post) });
         })
         .then(data => {
-            if (!(data instanceof Number)) {
-                post = data;
-            }
-
             return new Promise(resolve => {
                 resolve({
-                    post: post
+                    post: data
                 });
             });
         });
@@ -171,7 +171,7 @@ const _refreshCommentsOfPost = post => (
         .exec()
         .then(comments => {
             const sorting = _compareObjects.bind(null, 'created_at');
-            post.comments = comments.sort(sorting);
+            post.comments = comments.sort(sorting).map(comment => ({comment: comment}));
             return post.save();
         })
 );

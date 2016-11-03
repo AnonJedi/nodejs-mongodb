@@ -96,7 +96,7 @@ module.exports.editPost = (req, res) => {
     }
 
     //Edit post if validation is success
-    postService.editPost(parsedData)
+    postService.editPost(parsedData.userId, parsedData.postId, parsedData.text)
         .then(data => {
             res.json(presenter.success(data));
         })

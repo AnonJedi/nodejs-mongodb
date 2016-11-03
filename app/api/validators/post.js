@@ -21,7 +21,6 @@ module.exports.validateCreatePostData = data => {
         parsedData.err.text = 'Post text cannot be empty';
     }
     parsedData.text = data.text;
-    console.log(parsedData);
 
     return parsedData;
 };

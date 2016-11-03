@@ -5,7 +5,9 @@ const commonValidator = require('./common');
 
 
 module.exports.validateCreateCommentData = data => {
-    const parsedData = {};
+    const parsedData = {
+        err: {}
+    };
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot comment post as another user';
@@ -31,7 +33,9 @@ module.exports.validateCreateCommentData = data => {
 
 
 module.exports.validateEditCommentData = data => {
-    const parsedData = {};
+    const parsedData = {
+        err: {}
+    };
 
     if (data.authorizedUserId !== data.userId) {
         parsedData.err.authorizedUserId = 'User cannot edit comment of another user';

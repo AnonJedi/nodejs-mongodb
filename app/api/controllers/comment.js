@@ -111,10 +111,9 @@ module.exports.deleteComment = (req, res) => {
         res.json(presenter.fail(null, parsedData.err));
         return;
     }
-
     commentService.deleteComment(parsedData.userId, parsedData.commentId)
-        .then(() => {
-            res.json(presenter.success(null));
+        .then((data) => {
+            res.json(presenter.success(data));
         })
         .catch(err => {
             console.log(err);

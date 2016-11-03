@@ -7,8 +7,8 @@ const isAuth       = require('../controllers/auth').isAuth;
 
 const router = express.Router({ mergeParams: true });
 
-router.get('/', isAuth, post.getPosts);
 router.post('/new', isAuth, post.createPost);
+router.get('/', isAuth, post.getPosts);
 router.get('/:postId', isAuth, post.getPost);
 router.put('/:postId', isAuth, post.editPost);
 router.delete('/:postId', isAuth, post.deletePost);
