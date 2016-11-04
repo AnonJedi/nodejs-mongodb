@@ -3,10 +3,10 @@
 
 const passport        = require('passport');
 const LocalStrategy   = require('passport-local').Strategy;
+const BearerStrategy  = require('passport-http-bearer').Strategy;
 const jwt             = require('jsonwebtoken');
-const expressJwt      = require('express-jwt');
-const blacklist       = require('express-jwt-blacklist');
 const UserModel       = require('../models/user');
+const AuthModel       = require('../models/auth');
 const presenter       = require('../presenters/presenter');
 
 
@@ -36,9 +36,23 @@ passport.use(new LocalStrategy(
 	}
 ));
 
+
+passport.use(new BearerStrategy((token, cb) => {
+	return AuthModel.findOne({token: token}).exec()
+		.then(user => {
+			if (!user) { return cb(null, false); }
+			return cb(null, user);
+		})
+		.catch(err => (
+			cb(err)
+		));
+}));
+
+
 passport.serializeUser((user, cb) => {
 	cb(null, user.id);
 });
+
 
 passport.deserializeUser((id, cb) => {
 	UserModel.findById(id, (err, user) => {
@@ -50,13 +64,22 @@ passport.deserializeUser((id, cb) => {
 
 module.exports.passport = passport;
 module.exports.loginUser = passport.authenticate('local', { session : false });
-module.exports.isAuth = expressJwt({ secret: 'bbuttons with nodejs' });
+module.exports.isAuth = passport.authenticate('bearer', { session : false });
+
 
 module.exports.generateToken = (req, res, next) => {
-	req.token = jwt.sign({ id: req.user.id }, 'bbuttons with nodejs', {
-		expiresIn: '1d'
-	});
-	next();
+	const token = jwt.sign({ id: req.user.id }, 'bbuttons with nodejs');
+	UserModel.findById(req.user.id).exec()
+		.then(user => (
+			AuthModel({
+				token: token,
+				user: user
+			}).save()
+		))
+		.then(() => {
+			req.token = token;
+			next();
+		});
 };
 
 
@@ -68,18 +91,9 @@ module.exports.respond = (req, res) => {
 };
 
 
-module.exports.isRevokedCallback = (req, payload, done) => {
-	const issuer = payload.iss;
-	const tokenId = payload.jti;
-
-	data.getRevokedToken(issuer, tokenId, (err, token) => {
-		if (err) { return done(err); }
-		return done(null, !!token);
-	});
-};
-
-
 module.exports.logout = (req, res) => {
-	blacklist.revoke(req.user);
-	res.json(presenter.success(null));
+	AuthModel.remove({token: req.user.token})
+		.then(() => {
+			res.json(presenter.success(null));
+		});
 };
