@@ -7,9 +7,6 @@ module.exports.validateCreateUserData = data => {
   const parsedData = {
     err: {}
   };
-  if (!data) {
-    parsedData.err.data = 'User data is required';
-  }
 
   const fields = ['login', 'password', 'firstname', 'lastname'];
 
