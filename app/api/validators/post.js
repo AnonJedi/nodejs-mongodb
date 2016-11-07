@@ -9,7 +9,7 @@ module.exports.validateCreatePostData = data => {
         err: {}
     };
     if (data.authorizedUserId != data.userId) {
-        parsedData.err.authorizedUserId = 'User cannot create post for another user';
+        parsedData.err.authorizedUserId = 'User cannot create post as another user';
     }
     if (!commonValidator.validateObjectId(data.userId)) {
         parsedData.err.userId = `User id '${data.userId}' is not valid`;

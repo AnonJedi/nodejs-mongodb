@@ -27,8 +27,7 @@ const userSchema = new Schema({
 	},
 	stream_id: {
 		type: Schema.Types.ObjectId,
-		required: true,
-		unique: true
+		required: true
 	}
 }, { autoIndex: false });
 
@@ -42,4 +41,9 @@ userSchema.methods.verifyPassword = function (password, callback) {
 };
 
 
-module.exports = mongoose.model('users', userSchema);
+const Model = module.exports = mongoose.model('users', userSchema);
+
+
+Model.ensureIndexes(err => {
+	if (err) console.log(err);
+});

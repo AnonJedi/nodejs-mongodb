@@ -13,5 +13,9 @@ const streamSchema = new Schema({
 }, { autoIndex: false });
 
 
+Model = module.exports = mongoose.model('streams', streamSchema);
 
-module.exports = mongoose.model('streams', streamSchema);
+
+Model.ensureIndexes(err => {
+	if (err) console.log(err);
+});

@@ -9,7 +9,7 @@ const commonValidator   = require('../validators/common');
 
 module.exports.createPost = (req, res) => {
     const rawData = {
-        authorizedUserId: req.user.id,
+        authorizedUserId: req.user.data._id,
         userId: req.params.userId,
         text: req.body.text
     };
@@ -82,7 +82,7 @@ module.exports.editPost = (req, res) => {
     const rawData = {
         text: req.body.text,
         userId: req.params.userId,
-        authorizedUserId: req.user.id,
+        authorizedUserId: req.user.data._id,
         postId: req.params.postId
     };
 
@@ -110,7 +110,7 @@ module.exports.editPost = (req, res) => {
 module.exports.deletePost = (req, res) => {
     //Get all data for validation
     const rawData = {
-        authorizedUserId: req.user.id,
+        authorizedUserId: req.user.data._id,
         userId: req.params.userId,
         postId: req.params.postId
     };
@@ -138,7 +138,7 @@ module.exports.deletePost = (req, res) => {
 module.exports.togglePostLike = (req, res) => {
     //Get all data for validation
     const rawData = {
-        authorizedUserId: req.user.id,
+        authorizedUserId: req.user.data._id,
         userId: req.params.userId,
         postId: req.params.postId
     };

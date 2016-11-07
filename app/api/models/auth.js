@@ -22,4 +22,12 @@ const authSchema = new Schema({
 });
 
 
-module.exports = mongoose.model('auths', authSchema);
+authSchema.index({token: 1});
+
+
+const Model = module.exports = mongoose.model('auths', authSchema);
+
+
+Model.ensureIndexes(err => {
+  if (err) console.log(err);
+});

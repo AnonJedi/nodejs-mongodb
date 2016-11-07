@@ -31,5 +31,9 @@ const postSchema = new Schema({
 }, { autoIndex: false });
 
 
+const Model = module.exports = mongoose.model('posts', postSchema);
 
-module.exports = mongoose.model('posts', postSchema);
+
+Model.ensureIndexes(err => {
+	if (err) console.log(err);
+});

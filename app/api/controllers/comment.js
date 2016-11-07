@@ -9,7 +9,7 @@ const commonValidator = require('../validators/common');
 
 module.exports.createComment = (req, res) => {
   const rawData = {
-    authorizedUserId: req.user.id,
+    authorizedUserId: req.user.data._id,
     userId: req.params.userId,
     postId: req.params.postId,
     text: req.body.text
@@ -76,7 +76,7 @@ module.exports.getCommentsPage = (req, res) => {
 
 module.exports.editComment = (req, res) => {
   const rawData = {
-    authorizedUserId: req.user.id,
+    authorizedUserId: req.user.data._id,
     userId: req.params.userId,
     commentId: req.params.commentId,
     text: req.body.text
@@ -101,7 +101,7 @@ module.exports.editComment = (req, res) => {
 
 module.exports.deleteComment = (req, res) => {
   const rawData = {
-    authorizedUserId: req.user.id,
+    authorizedUserId: req.user.data._id,
     userId: req.params.userId,
     commentId: req.params.commentId
   };
@@ -125,7 +125,7 @@ module.exports.deleteComment = (req, res) => {
 module.exports.postCommentLike = (req, res) => {
   const rawData = {
     userId: req.params.userId,
-    authorizedUserId: req.user.id,
+    authorizedUserId: req.user.data._id,
     commentId: req.params.commentId
   };
 

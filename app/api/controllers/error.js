@@ -3,8 +3,8 @@
 const presenter   = require('../presenters/presenter');
 
 
+//Passport haven't unauthorized handler (((
 module.exports.unauthHandler = (err, req, res, next) => {
-  console.log(err);
   if (err.name === 'Unauthorized') {
     res.json(presenter.fail(null, `${err.name}: ${err.message}`));
   }

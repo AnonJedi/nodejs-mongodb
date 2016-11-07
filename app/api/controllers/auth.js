@@ -39,9 +39,12 @@ passport.use(new LocalStrategy(
 
 passport.use(new BearerStrategy((token, cb) => {
 	return AuthModel.findOne({token: token}).exec()
-		.then(user => {
-			if (!user) { return cb(null, false); }
-			return cb(null, user);
+		.then(auth => {
+			if (!auth) { return cb(null, false); }
+			return cb(null, {
+				token: auth.token,
+				data: auth.user
+			});
 		})
 		.catch(err => (
 			cb(err)

@@ -68,7 +68,7 @@ module.exports.createUser = (req, res) => {
 module.exports.createFollower = (req, res) => {
 	//Validate user id and following user id
 	const rawData = {
-		authorizedUserId: req.user.id,
+		authorizedUserId: req.user.data._id,
 		userId: req.params.userId,
 		trackedUserId: req.params.followingUserId
 	};
@@ -96,7 +96,7 @@ module.exports.createFollower = (req, res) => {
 module.exports.removeFollower = (req, res) => {
 	//Validate user id and following user id
 	const rawData = {
-		authorizedUserId: req.user.id,
+		authorizedUserId: req.user.data._id,
 		userId: req.params.userId,
 		trackedUserId: req.params.followingUserId
 	};
@@ -124,7 +124,7 @@ module.exports.removeFollower = (req, res) => {
 module.exports.deleteUser = (req, res) => {
 	const rawData = {
 		userId: req.params.userId,
-		authorizedUserId: req.user.id
+		authorizedUserId: req.user.data._id
 	};
 
 	const parsedData = validators.validateDeleteUserData(rawData);

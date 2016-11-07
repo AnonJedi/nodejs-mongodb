@@ -27,5 +27,9 @@ const commentSchema = new Schema({
 }, { autoIndex: false });
 
 
+const Model = module.exports = mongoose.model('comments', commentSchema);
 
-module.exports = mongoose.model('comments', commentSchema);
+
+Model.ensureIndexes(err => {
+	if (err) console.log(err);
+});
