@@ -1,9 +1,8 @@
 'use strict';
 
 
-const expect          = require('chai').expect;
-const validator       = require('../../../../validators/user');
-
+const expect      = require('chai').expect;
+const validator   = require('../../../../validators/user');
 
 
 describe('User unit test', () => {
