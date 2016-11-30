@@ -27,4 +27,6 @@ services:
       - /usr/src/node_modules
     links:
       - "api"
-    command: /bin/bash -c "npm i && npm run build && npm start"
+    env_file:
+      - ".env.client"
+    command: /bin/bash -c "npm i && npm start"

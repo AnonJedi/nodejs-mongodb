@@ -7,12 +7,12 @@ const isAuth = require('../controllers/auth').isAuth;
 const router = require('express').Router({mergeParams: true});
 
 
-router.post('/posts/:postId/comments/new', isAuth, comment.createComment);
-router.get('/comments/:commentId', isAuth, comment.getComment);
-router.get('/posts/:postId/comments', isAuth, comment.getCommentsPage);
-router.put('/comments/:commentId', isAuth, comment.editComment);
-router.delete('/comments/:commentId', isAuth, comment.deleteComment);
-router.post('/comments/:commentId/like', isAuth, comment.postCommentLike);
+router.post('/posts/:postId/comments/new', comment.createComment);
+router.get('/comments/:commentId', comment.getComment);
+router.get('/posts/:postId/comments', comment.getCommentsPage);
+router.put('/comments/:commentId', comment.editComment);
+router.delete('/comments/:commentId', comment.deleteComment);
+router.post('/comments/:commentId/like', comment.postCommentLike);
 
 
 module.exports = router;

@@ -4,3 +4,4 @@ npm-debug.log
 docker-compose.override.yml
 .env.mongodb
 .env.api
+.env.client

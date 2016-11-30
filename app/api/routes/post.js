@@ -7,12 +7,12 @@ const isAuth       = require('../controllers/auth').isAuth;
 
 const router = express.Router({ mergeParams: true });
 
-router.post('/new', isAuth, post.createPost);
-router.get('/', isAuth, post.getPosts);
-router.get('/:postId', isAuth, post.getPost);
-router.put('/:postId', isAuth, post.editPost);
-router.delete('/:postId', isAuth, post.deletePost);
-router.post('/:postId/like', isAuth, post.togglePostLike);
+router.post('/new', post.createPost);
+router.get('/', post.getPosts);
+router.get('/:postId', post.getPost);
+router.put('/:postId', post.editPost);
+router.delete('/:postId', post.deletePost);
+router.post('/:postId/like', post.togglePostLike);
 
 
 module.exports = router;
